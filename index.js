@@ -14,6 +14,9 @@ app.use(helmet())
 app.use(morgan("common"))
 
 
+app.get("/", (req,res)=>{
+    res.send("Welcome to Mentorify!")
+})
 
 //db connection
 connection()
