@@ -5,6 +5,7 @@ const connection = require('./utils/db-connection')
 const dotenv = require("dotenv")
 const helmet = require("helmet")
 const morgan = require("morgan")
+const errorHandler = require("./middlewares/error-handler")
 
 dotenv.config()
 
@@ -12,7 +13,7 @@ dotenv.config()
 app.use(express.json()) //when we make post request it's gonna parse it.
 app.use(helmet())
 app.use(morgan("common"))
-
+app.use(errorHandler)
 
 app.get("/", (req,res)=>{
     res.send("Welcome to Mentorify!")
