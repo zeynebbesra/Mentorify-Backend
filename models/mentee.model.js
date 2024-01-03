@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const BaseUser = require('../models/base-user.model')
 
 const menteeSchema = new mongoose.Schema(
     {
@@ -10,11 +11,13 @@ const menteeSchema = new mongoose.Schema(
             ref: Interest,
             required: true
         },
-        reviews: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Review',
-        }],
-    }
+        // reviews: [{
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: 'Review',
+        // }],
+    },
+    { discriminatorKey: 'kind' }
 )
 
-module.exports = mongoose.model("Mentee", menteeSchema)
+// module.exports = mongoose.model("Mentee", menteeSchema)
+module.exports = BaseUser.discriminator('Mentee', menteeSchema)

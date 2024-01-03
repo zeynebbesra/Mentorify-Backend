@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const BaseUser = require('../models/base-user.model')
 
 const mentorSchema = new mongoose.Schema(
     {
@@ -27,7 +28,9 @@ const mentorSchema = new mongoose.Schema(
             ref: 'Review',
         }],
 
-    }
+    },
+    { discriminatorKey: 'kind' }
 )
 
-module.exports = mongoose.model("Mentor", mentorSchema)
+// module.exports = mongoose.model("Mentor", mentorSchema)
+module.exports = BaseUser.discriminator('Mentor', mentorSchema)
