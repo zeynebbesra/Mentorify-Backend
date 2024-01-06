@@ -19,6 +19,14 @@ app.get("/", (req,res)=>{
     res.send("Welcome to Mentorify!")
 })
 
+//Routers
+const mentorRouter =  require('./routes/mentor.routes')
+
+const api = process.env.API_URL
+
+app.use(`${api}/mentors`, mentorRouter)
+
+
 //db connection
 connection()
 
