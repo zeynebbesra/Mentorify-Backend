@@ -20,12 +20,13 @@ const userSchema = new mongoose.Schema(
         },
         desc:{
             type: String,
-            max: 50
-        },
-        accountType:{
-            type: String,
+            max: 50,
             required: true
-        }
+        },
+        // accountType:{
+        //     type: String,
+        //     required: true
+        // }
     },
     {timestamps: true}
 )

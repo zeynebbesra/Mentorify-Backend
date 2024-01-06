@@ -5,13 +5,11 @@ const mentorSchema = new mongoose.Schema(
     {
         category:{
             type: mongoose.Schema.Types.ObjectId,
-            ref: Category,
-            required: true
+            ref: 'Category',
         },
         interest:{
             type: mongoose.Schema.Types.ObjectId,
-            ref: Interest,
-            required: true
+            ref: 'Interest',
         },
         experience: {
             type: Number,
