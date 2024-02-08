@@ -5,11 +5,11 @@ const passport = require('../utils/passport')
 const menteeController = require('../controllers/mentee.controller')
 
 router
-    .route('/register/mentee')
+    .route('/register')
     .post(menteeController.register)
 
 router
-    .route('/login/mentee')
+    .route('/login')
     .post(menteeController.login)
 
 // Google ile giriş yapma yolu
