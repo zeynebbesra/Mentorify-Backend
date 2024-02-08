@@ -1,25 +1,22 @@
 const httpStatus = require('http-status')
-const bcrypt = require('bcrypt')
 const ApiError = require('../responses/error/api-error')
 const ApiDataSuccess = require('../responses/success/api-success')
 const Mentor = require('../models/mentor.model')
 const { createLoginToken } = require('../helpers/jwt.helper')
-
+const passwordHelper = require('../helpers/password.helper')
 
 //Register
 const register = async(req, res, next) => {
-    //generate new password
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword =  await bcrypt.hash(req.body.password, salt)
-
+    const mentorPassword = (await passwordHelper.passwordToHash(req.body.password))
     try {
         //create new mentor
         const newMentor = new Mentor({
             username: req.body.username,
             email: req.body.email,
-            password: hashedPassword,
+            password: mentorPassword,
             desc: req.body.desc
         })
+    
         const mentor = await newMentor.save()
         ApiDataSuccess.send("Register succesfull!", httpStatus.CREATED, res, mentor)
     } catch (error) {
@@ -69,6 +66,10 @@ const login = async(req, res, next) => {
     }
 }
 
+
+//Update Mentor
+
+// const updateMentor
 
 module.exports = {
     register,
