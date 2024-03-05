@@ -53,11 +53,13 @@ app.get("/", (req,res)=>{
 //Routers
 const mentorRouter = require('./routes/mentor.routes')
 const menteeRouter = require('./routes/mentee.routes')
+const categoryRouter = require('./routes/category.routes')
 
 const api = process.env.API_URL
 
 app.use(`${api}/mentors`, mentorRouter)
 app.use(`${api}/mentees`, menteeRouter)
+app.use(`${api}/categories`, categoryRouter)
 
 //db connection
 connection()

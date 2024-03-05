@@ -7,10 +7,10 @@ const mentorSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Category',
         },
-        interest:{
+        interest:[{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Interest',
-        },
+        }],
         experience: {
             type: Number,
         },
@@ -25,7 +25,6 @@ const mentorSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Review',
         }],
-
     },
     { discriminatorKey: 'kind' }
 )

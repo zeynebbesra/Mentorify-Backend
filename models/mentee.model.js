@@ -6,15 +6,17 @@ const menteeSchema = new mongoose.Schema(
         goal:{
             type: String
         },
-        interest:{
+        interest:[{
             type: mongoose.Schema.Types.ObjectId,
-            ref: Interest,
-            required: true
-        },
+            ref: 'Interest',
+        }],
         // reviews: [{
         //     type: mongoose.Schema.Types.ObjectId,
         //     ref: 'Review',
         // }],
+        costInterval: {
+            
+        }
     },
     { discriminatorKey: 'kind' }
 )

@@ -10,4 +10,8 @@ router
     .route('/login')
     .post(mentorController.login)
 
+router
+    .route('/update/:id')
+    .put(mentorController.updateMentor)
+
 module.exports = router
