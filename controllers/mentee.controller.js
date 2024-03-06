@@ -5,6 +5,31 @@ const Mentee = require('../models/mentee.model')
 const { createLoginToken } = require('../helpers/jwt.helper')
 const passwordHelper = require('../helpers/password.helper')
 
+//Get Mentees
+const getMentees = async(req ,res, next) => {
+    const mentees = await Mentee.find()
+    
+    try {
+        if(!mentees){
+            return next(
+                new ApiError(
+                    "Mentees failed to load",
+                    httpStatus.NOT_FOUND
+                )
+            )
+        }
+        ApiDataSuccess.send("Mentees loaded successfully", httpStatus.OK, res, mentees)
+    } catch (error) {
+        return next(
+            new ApiError(
+                "An error ocured",
+                httpStatus.INTERNAL_SERVER_ERROR
+            )
+        )
+        
+    }
+}
+
 //Register
 const register = async(req, res, next) => {
     const menteePassword = (await passwordHelper.passwordToHash(req.body.password))
@@ -81,5 +106,6 @@ const googleLogin = (req, res, next) => {
 module.exports = {
     register,
     login,
-    googleLogin
+    googleLogin,
+    getMentees,
 }

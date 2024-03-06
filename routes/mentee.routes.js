@@ -21,5 +21,8 @@ router.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login/mentee' }),
   menteeController.googleLogin);
 
+router
+  .route('/')
+  .get(menteeController.getMentees)
 
 module.exports = router
