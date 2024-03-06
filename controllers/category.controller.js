@@ -26,21 +26,18 @@ const getCategories = async(req, res, next) => {
     
 }
 
-const createCategories = async(req, res, next) => {
-    const categories = await new Category({
-        name: req.body.name,
-        interests: req.body.interests
-    })
+const createCategory = async(req, res, next) => {
+    const category = await new Category(req.body).save()
     try {
-        if(!categories){
+        if(!category){
             return next(
                 new ApiError(
                     "Failed to create category!",
                     httpStatus.BAD_REQUEST
                 )
-            )
+            )   
         }
-        ApiDataSuccess.send("Categories loaded successfully", httpStatus.OK, res, categories)
+        ApiDataSuccess.send("Category loaded successfully", httpStatus.OK, res, category)
         
     } catch (error) {
         return next(
@@ -56,9 +53,8 @@ const createCategories = async(req, res, next) => {
 
 
 
-
 module.exports = {
     getCategories,
-    createCategories,
+    createCategory
 
 }

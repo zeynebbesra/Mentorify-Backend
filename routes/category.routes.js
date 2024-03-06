@@ -6,4 +6,8 @@ router
     .route('/')
     .get(categoryController.getCategories)
 
+router
+    .route('/')
+    .post(categoryController.createCategory)
+
 module.exports = router
