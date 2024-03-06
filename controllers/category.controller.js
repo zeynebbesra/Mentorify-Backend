@@ -43,7 +43,12 @@ const createCategories = async(req, res, next) => {
         ApiDataSuccess.send("Categories loaded successfully", httpStatus.OK, res, categories)
         
     } catch (error) {
-        
+        return next(
+            new ApiError(
+                "Failed to create category!",
+                httpStatus.INTERNAL_SERVER_ERROR
+            )
+        )
     }
 
 }
