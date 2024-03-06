@@ -26,7 +26,6 @@ const getMentees = async(req ,res, next) => {
                 httpStatus.INTERNAL_SERVER_ERROR
             )
         )
-        
     }
 }
 

@@ -3,6 +3,10 @@ const mentorController = require('../controllers/mentor.controller')
 const router = express.Router()
 
 router
+    .route('/')
+    .get(mentorController.getMentors)
+
+router
     .route('/register')
     .post(mentorController.register)
 

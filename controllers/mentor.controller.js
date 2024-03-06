@@ -6,6 +6,29 @@ const Mentor = require('../models/mentor.model')
 const { createLoginToken } = require('../helpers/jwt.helper')
 const passwordHelper = require('../helpers/password.helper')
 
+//Get Mentors
+const getMentors = async(req, res, next)=> {
+    const mentors = await Mentor.find()
+    try {
+        if(!mentors){
+            return next(
+                new ApiError(
+                    "Mentors failed to load",
+                    httpStatus.NOT_FOUND
+                )
+            )
+        }
+        ApiDataSuccess.send("Mentors loaded successfully", httpStatus.OK, res, mentors)
+    } catch (error) {
+        return next(
+            new ApiError(
+                "An error ocured",
+                httpStatus.INTERNAL_SERVER_ERROR
+            )
+        )
+    }
+}
+
 //Register
 const register = async(req, res, next) => {
     const mentorPassword = (await passwordHelper.passwordToHash(req.body.password))
@@ -119,13 +142,12 @@ const updateMentor = async (req, res, next) => {
             )
         }
 
-        return ApiDataSuccess
+        return ApiDataSuccess.send("Profile changed successfully!", httpStatus.CREATED, res, updatedMentor)
     
     } catch (error) {
         return next(
             new ApiError(
                 'Something went wrong :(',
-                console.log("ERROR:",error),
                 httpStatus.BAD_REQUEST,
                 error.message
             )
@@ -141,5 +163,6 @@ module.exports = {
     register,
     login,
     updateMentor,
+    getMentors,
     deleteUser
 }
