@@ -26,6 +26,7 @@ const getMentees = async(req ,res, next) => {
                 httpStatus.INTERNAL_SERVER_ERROR
             )
         )
+
     }
 }
 
@@ -35,10 +36,13 @@ const register = async(req, res, next) => {
     try {
         //create new mentor
         const newMentee = new Mentee({
-            username: req.body.username,
+            // username: req.body.username,
+            name: req.body.name,
+            surname: req.body.surname,
             email: req.body.email,
             password: menteePassword,
-            desc: req.body.desc
+            desc: req.body.desc,
+            interests: req.body.interests
         })
         const mentee = await newMentee.save()
         ApiDataSuccess.send("Register succesfull!", httpStatus.CREATED, res, mentee)

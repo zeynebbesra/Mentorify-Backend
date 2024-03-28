@@ -3,10 +3,10 @@ const BaseUser = require('../models/base-user.model')
 
 const menteeSchema = new mongoose.Schema(
     {
-        goal:{
-            type: String
-        },
-        interest:[{
+        // goal:{
+        //     type: String
+        // },
+        interests:[{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Interest',
         }],
@@ -14,9 +14,9 @@ const menteeSchema = new mongoose.Schema(
         //     type: mongoose.Schema.Types.ObjectId,
         //     ref: 'Review',
         // }],
-        costInterval: {
+        // costInterval: {
             
-        }
+        // }
     },
     { discriminatorKey: 'kind' }
 )
