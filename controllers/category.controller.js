@@ -50,11 +50,35 @@ const createCategory = async(req, res, next) => {
 
 }
 
+const updateCategory = async(req,res,next) => {
+    const {categoryId} = req.params
+    const updatedData = req.body
 
+    try {
+        const updatedCategory = await Category.findByIdAndUpdate(categoryId, updatedData, {new: true})
+        if(!updatedCategory){
+            return next(
+                new ApiError(
+                    "Category not found",
+                    httpStatus.NOT_FOUND
+                )
+            )
+        }
+        ApiDataSuccess.send("Category updated successfully", httpStatus.OK, res, updatedCategory)
+    } catch (error) {
+        return next(
+            new ApiError(
+                "Failed to update category",
+                httpStatus.INTERNAL_SERVER_ERROR
+            )
+        )
+    }
+
+}
 
 
 module.exports = {
     getCategories,
-    createCategory
-
+    createCategory,
+    updateCategory
 }

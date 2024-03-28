@@ -10,4 +10,8 @@ router
     .route('/')
     .post(categoryController.createCategory)
 
+router
+    .route('/update/:id')
+    .patch(categoryController.updateCategory)
+
 module.exports = router
