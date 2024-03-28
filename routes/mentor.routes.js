@@ -1,20 +1,7 @@
 const express = require('express')
 const mentorController = require('../controllers/mentor.controller')
 const router = express.Router()
-const multer = require('multer')
-
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb){
-        cb(null, 'public/uploads')
-    },
-    filename: function(req, file, cb){
-        cb(null, file.fieldname + '-' + Date.now())
-    }
-})
-
-const upload = multer({storage: storage})
-
+const uploadOptions = require('../helpers/uploadImage.helper')
 
 router
     .route('/')
@@ -22,7 +9,7 @@ router
 
 router
     .route('/register')
-    .post(upload.single('photo'), mentorController.register)
+    .post(uploadOptions.single('photo'), mentorController.register)
 
 router
     .route('/login')
