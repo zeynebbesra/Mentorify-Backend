@@ -35,7 +35,9 @@ const register = async(req, res, next) => {
     try {
         //create new mentor
         const newMentor = new Mentor({
-            username: req.body.username,
+            // username: req.body.username,
+            name: req.body.name,
+            surname: req.body.surname,
             email: req.body.email,
             password: mentorPassword,
             category: req.body.category,
@@ -121,7 +123,8 @@ const updateMentor = async (req, res, next) => {
         const updatedMentor = await Mentor.findByIdAndUpdate(
             req.params.id,
             {
-                username: req.body.username,
+                name: req.body.name,
+                surname: req.body.surname,
                 email: req.body.email,
                 password: newPassword,
                 desc: req.body.desc,
@@ -155,7 +158,29 @@ const updateMentor = async (req, res, next) => {
     }
 }
 
-const deleteUser = async(req, res, next) => {
+const deleteMentor = async(req, res, next) => {
+    const {userId} = req.params
+    const deletedData = req.body
+
+    try {
+        const deletedUser = await Mentor.findByIdAndDelete(userId, deletedData, {new: true})
+        if(!deletedUser){
+            return next(
+                new ApiError(
+                    "Mentor not found",
+                    httpStatus.NOT_FOUND
+                )
+            )
+        }
+        ApiDataSuccess.send("Mentor deleted successfully", httpStatus.OK, res, deletedUser)
+    } catch (error) {
+        return next(
+            new ApiError(
+                "Failed to delete user",
+                httpStatus.NOT_FOUND
+            )
+        )
+    }
 
 }
 
@@ -164,5 +189,5 @@ module.exports = {
     login,
     updateMentor,
     getMentors,
-    deleteUser
+    deleteMentor
 }

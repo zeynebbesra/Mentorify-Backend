@@ -18,4 +18,8 @@ router
     .route('/update/:id')
     .put(mentorController.updateMentor)
 
+router
+    .route('/delete/:id')
+    .delete(mentorController.deleteMentor)
+
 module.exports = router
