@@ -6,6 +6,7 @@ const Mentor = require('../models/mentor.model')
 const { createLoginToken } = require('../helpers/jwt.helper')
 const passwordHelper = require('../helpers/password.helper')
 
+
 //Get Mentors
 const getMentors = async(req, res, next)=> {
     const mentors = await Mentor.find()
@@ -42,7 +43,8 @@ const register = async(req, res, next) => {
             password: mentorPassword,
             category: req.body.category,
             interests: req.body.interests,
-            desc: req.body.desc
+            desc: req.body.desc,
+            photo: req.file.path,
         })
     
         const mentor = await newMentor.save()
