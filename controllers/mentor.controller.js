@@ -68,7 +68,6 @@ const register = async(req, res, next) => {
         validatePassword(req.body.password)
         //create new mentor
         const newMentor = new Mentor({
-            // username: req.body.username,
             name: req.body.name,
             surname: req.body.surname,
             email: req.body.email,
