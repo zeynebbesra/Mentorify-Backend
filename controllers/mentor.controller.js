@@ -160,31 +160,20 @@ const updateMentor = async (req, res, next) => {
     }
 }
 
+
 const deleteMentor = async(req, res, next) => {
-    const {userId} = req.params
-    const deletedData = req.body
-
     try {
-        const deletedUser = await Mentor.findByIdAndDelete(userId, deletedData, {new: true})
-        if(!deletedUser){
-            return next(
-                new ApiError(
-                    "Mentor not found",
-                    httpStatus.NOT_FOUND
-                )
-            )
+        const deletedUser = await Mentor.findByIdAndDelete(req.params.id);
+        console.log("deleted user",deletedUser)
+        if (!deletedUser) {
+            return next(new ApiError("Mentor not found", httpStatus.NOT_FOUND));
         }
-        ApiDataSuccess.send("Mentor deleted successfully", httpStatus.OK, res, deletedUser)
+        ApiDataSuccess.send("Mentor deleted successfully", httpStatus.OK, res, deletedUser);
     } catch (error) {
-        return next(
-            new ApiError(
-                "Failed to delete user",
-                httpStatus.NOT_FOUND
-            )
-        )
+        return next(new ApiError("Failed to delete user", httpStatus.INTERNAL_SERVER_ERROR));
     }
-
 }
+
 
 module.exports = {
     register,
