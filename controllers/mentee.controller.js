@@ -5,6 +5,7 @@ const Mentee = require('../models/mentee.model')
 const { createLoginToken } = require('../helpers/jwt.helper')
 const passwordHelper = require('../helpers/password.helper')
 
+
 //Get Mentees
 const getMentees = async(req ,res, next) => {
     const mentees = await Mentee.find()

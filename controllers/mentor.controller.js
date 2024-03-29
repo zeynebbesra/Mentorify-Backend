@@ -5,7 +5,7 @@ const ApiDataSuccess = require('../responses/success/api-success')
 const Mentor = require('../models/mentor.model')
 const { createLoginToken } = require('../helpers/jwt.helper')
 const passwordHelper = require('../helpers/password.helper')
-
+const validatePassword = require('../helpers/passwordValidator.helper')
 
 //Get Mentors
 const getMentors = async(req, res, next)=> {
@@ -65,6 +65,7 @@ const getMentor =  async(req,res,next) => {
 const register = async(req, res, next) => {
     const mentorPassword = (await passwordHelper.passwordToHash(req.body.password))
     try {
+        validatePassword(req.body.password)
         //create new mentor
         const newMentor = new Mentor({
             // username: req.body.username,
