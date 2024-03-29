@@ -30,6 +30,37 @@ const getMentors = async(req, res, next)=> {
     }
 }
 
+//Get Mentor
+
+const getMentor =  async(req,res,next) => {
+    const {id} = req.params
+
+    try {
+        const mentor = await Mentor.findById(id)
+        if (!mentor){
+            return next(
+                new ApiError(
+                    `There is no mentor with this id: ${id}`,
+                    httpStatus.BAD_REQUEST
+                )
+            )
+        }
+        const {password, updatedAt, createdAt, ...other} = mentor._doc
+
+        ApiDataSuccess.send(
+            'Mentor with given id found',
+            httpStatus.OK,
+            res,
+            other
+        )
+    } catch (error) {
+        return next(
+            new ApiError(error.message, httpStatus.NOT_FOUND)
+        )
+    }
+}
+
+
 //Register
 const register = async(req, res, next) => {
     const mentorPassword = (await passwordHelper.passwordToHash(req.body.password))
@@ -180,5 +211,6 @@ module.exports = {
     login,
     updateMentor,
     getMentors,
-    deleteMentor
+    deleteMentor,
+    getMentor
 }

@@ -30,6 +30,35 @@ const getMentees = async(req ,res, next) => {
     }
 }
 
+//Get Mentee
+const getMentee =  async(req,res,next) => {
+    const {id} = req.params
+
+    try {
+        const mentee = await Mentee.findById(id)
+        if (!mentee){
+            return next(
+                new ApiError(
+                    `There is no mentee with this id: ${id}`,
+                    httpStatus.BAD_REQUEST
+                )
+            )
+        }
+        const {password, updatedAt, createdAt, ...other} = mentee._doc
+
+        ApiDataSuccess.send(
+            'Mentee with given id found',
+            httpStatus.OK,
+            res,
+            other
+        )
+    } catch (error) {
+        return next(
+            new ApiError(error.message, httpStatus.NOT_FOUND)
+        )
+    }
+}
+
 //Register
 const register = async(req, res, next) => {
     const menteePassword = (await passwordHelper.passwordToHash(req.body.password))
@@ -111,4 +140,5 @@ module.exports = {
     login,
     googleLogin,
     getMentees,
+    getMentee
 }

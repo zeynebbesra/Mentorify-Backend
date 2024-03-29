@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-// const passport = require('passport')
 const passport = require('../utils/passport')
 const menteeController = require('../controllers/mentee.controller')
 
@@ -24,5 +23,9 @@ router.get('/auth/google/callback',
 router
   .route('/')
   .get(menteeController.getMentees)
+
+router
+  .route('/:id')
+  .get(menteeController.getMentee)
 
 module.exports = router

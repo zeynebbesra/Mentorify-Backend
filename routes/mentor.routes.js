@@ -23,4 +23,8 @@ router
     .route('/delete/:id')
     .delete(mentorController.deleteMentor)
 
+router
+    .route('/:id')
+    .get(mentorController.getMentor)
+
 module.exports = router
