@@ -66,7 +66,14 @@ const register = async(req, res, next) => {
     const mentorPassword = (await passwordHelper.passwordToHash(req.body.password))
     try {
         validatePassword(req.body.password)
-        //create new mentor
+        
+        const file = req.file
+        if(!file) return res.status(404).json({message:"There is no image in the request"})
+
+        const fileName = req.file.name
+
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`
+
         const newMentor = new Mentor({
             name: req.body.name,
             surname: req.body.surname,
@@ -75,7 +82,7 @@ const register = async(req, res, next) => {
             category: req.body.category,
             interests: req.body.interests,
             desc: req.body.desc,
-            photo: req.file.path,
+            image: `${basePath}${fileName}`
         })
     
         const mentor = await newMentor.save()
@@ -85,7 +92,6 @@ const register = async(req, res, next) => {
         return next(new ApiError(error.message, httpStatus.BAD_REQUEST))
         
     }
-
 }
 
 //Login

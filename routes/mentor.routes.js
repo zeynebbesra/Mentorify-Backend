@@ -9,7 +9,7 @@ router
 
 router
     .route('/register')
-    .post(uploadOptions.single('photo'), mentorController.register)
+    .post(uploadOptions.single('image'), mentorController.register)
 
 router
     .route('/login')

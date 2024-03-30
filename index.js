@@ -44,6 +44,7 @@ app.use(
 app.use(express.json()) //when we make post request it's gonna parse it.
 app.use(helmet())
 app.use(morgan("common"))
+app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
 app.use(errorHandler)
 
 app.get("/", (req,res)=>{

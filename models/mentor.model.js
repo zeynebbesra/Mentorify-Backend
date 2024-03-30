@@ -25,7 +25,7 @@ const mentorSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Review',
         }],
-        photo: {
+        image: {
             type: String
         },
     },
