@@ -9,7 +9,7 @@ const validatePassword = require('../helpers/passwordValidator.helper')
 
 //Get Mentors
 const getMentors = async(req, res, next)=> {
-    const mentors = await Mentor.find()
+    const mentors = await Mentor.find().select('-password')
     try {
         if(!mentors){
             return next(

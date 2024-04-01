@@ -8,7 +8,7 @@ const validatePassword = require('../helpers/passwordValidator.helper')
 
 //Get Mentees
 const getMentees = async(req ,res, next) => {
-    const mentees = await Mentee.find()
+    const mentees = await Mentee.find().select('-password')
     
     try {
         if(!mentees){
@@ -27,7 +27,6 @@ const getMentees = async(req ,res, next) => {
                 httpStatus.INTERNAL_SERVER_ERROR
             )
         )
-
     }
 }
 
