@@ -4,7 +4,7 @@ const BaseUser = require('../models/base-user.model')
 const mentorSchema = new mongoose.Schema(
     {
         category:{
-            type: mongoose.Schema.Types.ObjectId,
+            type: String,
             ref: 'Category',
         },
         interest:[{
