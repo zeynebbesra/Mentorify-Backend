@@ -70,7 +70,7 @@ const register = async(req, res, next) => {
         const file = req.file
         if(!file) return res.status(404).json({message:"There is no image in the request"})
 
-        const fileName = req.file.name
+        const fileName = req.file.filename
 
         const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`
 
