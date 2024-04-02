@@ -7,8 +7,8 @@ const mentorSchema = new mongoose.Schema(
             type: String,
             ref: 'Category',
         },
-        interest:[{
-            type: mongoose.Schema.Types.ObjectId,
+        interests:[{
+            type: String,
             ref: 'Interest',
         }],
         experience: {

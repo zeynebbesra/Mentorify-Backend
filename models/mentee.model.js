@@ -7,7 +7,7 @@ const menteeSchema = new mongoose.Schema(
         //     type: String
         // },
         interests:[{
-            type: mongoose.Schema.Types.ObjectId,
+            type: String,
             ref: 'Interest',
         }],
         // reviews: [{
