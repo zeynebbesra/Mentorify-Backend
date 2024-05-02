@@ -118,10 +118,11 @@ const login = async(req, res, next) => {
                 error.message
             )
         )
-        
     }
 }
 
+
+//Google ile giriş
 const googleLogin = (req, res, next) => {
     // Kullanıcı bilgilerini işleme
     if (!req.user) {
@@ -135,10 +136,73 @@ const googleLogin = (req, res, next) => {
     ApiDataSuccess.send("Login with Google successful!", httpStatus.OK, res, user);
 };
 
+
+// Wishlist'e Mentor Ekleme
+const addToWishlist = async(req,res,next) => {
+    const {menteeId, mentorId} = req.params
+
+    try {
+        await Mentee.findByIdAndUpdate(menteeId, {
+            $addToSet: {wishlist: mentorId}
+        })
+        ApiDataSuccess.send('Mentor added to wishlist successfully!', httpStatus.OK, res)
+    } catch (error) {
+        return next(    
+            new ApiError(
+                "Something went wrong :(",
+                httpStatus.INTERNAL_SERVER_ERROR,
+                error.message
+            )
+        )
+    }
+}
+
+
+// Wishlist'e Mentor Çıkarma
+const removeFromWishlist = async(req,res,next) => {
+    const {menteeId, mentorId} = req.params
+
+    try {
+        await Mentee.findByIdAndUpdate(menteeId, {
+            $pull: {wishlist: mentorId}
+        })
+        ApiDataSuccess.send('Mentor remove from wishlist successfully!', httpStatus.OK, res)
+    } catch (error) {
+        return next(    
+            new ApiError(
+                "Something went wrong :(",
+                httpStatus.INTERNAL_SERVER_ERROR,
+                error.message
+            )
+        )
+    }
+}
+
+
+// Mentee'nin Wishlist'ini Görüntüleme
+
+const getWishlist = async(req, res, next) => {
+    const {menteeId} = req.params
+    try {
+        const mentee = await Mentee.findById(menteeId).populate('wishlist', 'name surname desc rating image')
+        ApiDataSuccess.send("Mentee's wish list loaded", httpStatus.OK, res, mentee)
+    } catch (error) {
+        return next(    
+            new ApiError(
+                "Something went wrong :(",
+                httpStatus.INTERNAL_SERVER_ERROR,
+            )
+        )
+    }
+}
+
 module.exports = {
     register,
     login,
     googleLogin,
     getMentees,
-    getMentee
+    getMentee,
+    addToWishlist,
+    removeFromWishlist,
+    getWishlist
 }

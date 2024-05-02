@@ -28,4 +28,16 @@ router
   .route('/:id')
   .get(menteeController.getMentee)
 
+router
+  .route('/add-to-wishlist/:menteeId/:mentorId')
+  .put(menteeController.addToWishlist)
+
+router
+  .route('/remove-from-wishlist/:menteeId/:mentorId')
+  .put(menteeController.addToWishlist)
+
+router
+  .route('/wishlist/:menteeId')
+  .get(menteeController.getWishlist)
+
 module.exports = router

@@ -32,5 +32,4 @@ const mentorSchema = new mongoose.Schema(
     { discriminatorKey: 'kind' }
 )
 
-// module.exports = mongoose.model("Mentor", mentorSchema)
 module.exports = BaseUser.discriminator('Mentor', mentorSchema)
