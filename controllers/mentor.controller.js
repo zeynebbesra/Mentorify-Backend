@@ -140,6 +140,7 @@ const login = async (req, res, next) => {
 const updateMentor = async (req, res, next) => {
   try {
     const mentorExist = await Mentor.findById(req.params.id);
+    console.log(req.body)
     if (!mentorExist) {
       return next(new ApiError("Mentor not found.", httpStatus.NOT_FOUND));
     }
@@ -175,6 +176,7 @@ const updateMentor = async (req, res, next) => {
       },
       { new: true }
     );
+    console.log(req.body)
 
     if (!updatedMentor) {
       return next(
@@ -196,7 +198,8 @@ const updateMentor = async (req, res, next) => {
       new ApiError(
         "Something went wrong :(",
         httpStatus.BAD_REQUEST,
-        error.message
+        error.message,
+        console.log("error",error)
       )
     );
   }

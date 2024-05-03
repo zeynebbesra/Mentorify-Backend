@@ -17,7 +17,7 @@ router
 
 router
     .route('/update/:id')
-    .put(mentorController.updateMentor)
+    .patch(mentorController.updateMentor)
 
 router
     .route('/delete/:id')
