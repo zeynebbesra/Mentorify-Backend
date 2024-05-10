@@ -83,42 +83,6 @@ const register = async (req, res, next) => {
   }
 };
 
-// //Login
-
-// const login = async(req, res, next) => {
-//     try {
-//         const user = await Mentee.findOne({email: req.body.email})
-//         if(!user){
-//             return next(
-//                 new ApiError(
-//                     "Email or password is incorrect!",
-//                     httpStatus.BAD_REQUEST
-//                 )
-//             )
-//         }
-//         const validPassword = await bcrypt.compare(
-//             req.body.password,
-//             user.password
-//         )
-//         if(!validPassword){
-//             return next(
-//                 new ApiError(
-//                     "Password is incorrect!",
-//                     httpStatus.BAD_REQUEST
-//                 )
-//             )
-//         }
-//         const accessToken = createLoginToken(user, res)
-//         ApiDataSuccess.send("Login succesfull!", httpStatus.OK, res, accessToken)
-//     } catch (error) {
-//         return next(    
-//             new ApiError(
-//                 // console.log(error),
-//                 "Something went wrong :(",
-//                 httpStatus.INTERNAL_SERVER_ERROR,
-//                 error.message
-//             )
-//         )
 
 const login = async (req, res, next) => {
   try {
@@ -179,6 +143,109 @@ const googleLogin = (req, res, next) => {
     res,
     user
   );
+};
+
+//Update Mentee
+
+// const updateMentee = async (req, res, next) => {
+//   try {
+//     const menteeExist = await Mentee.findById(req.params.id);
+//     console.log(req.body)
+//     if (!menteeExist) {
+//       return next(new ApiError("Mentee not found.", httpStatus.NOT_FOUND));
+//     }
+
+//     let newPassword;
+
+//     if (req.body.password) {
+//       newPassword = await passwordHelper.passwordToHash(req.body.password);
+
+//       menteeExist.password = newPassword;
+//       await menteeExist.save();
+
+//       return ApiDataSuccess.send(
+//         "Password changed successfully!",
+//         httpStatus.CREATED,
+//         res
+//       );
+//     }
+
+//     const updatedMentee = await Mentee.findByIdAndUpdate(
+//       req.params.id,
+//       {
+//         name: req.body.name,
+//         surname: req.body.surname,
+//         email: req.body.email,
+//         password: newPassword,
+//         desc: req.body.desc,
+//         interest: req.body.interest
+//       },
+//       { new: true }
+//     );
+//     console.log(req.body)
+
+//     if (!updatedMentee) {
+//       return next(
+//         new ApiError(
+//           "Mentee could not be updated due to an unexpected condition.",
+//           httpStatus.INTERNAL_SERVER_ERROR
+//         )
+//       );
+//     }
+
+//     return ApiDataSuccess.send(
+//       "Profile changed successfully!",
+//       httpStatus.CREATED,
+//       res,
+//       updatedMentee
+//     );
+//   } catch (error) {
+//     return next(
+//       new ApiError(
+//         "Something went wrong :(",
+//         httpStatus.BAD_REQUEST,
+//         error.message,
+//         console.log("error",error)
+//       )
+//     );
+//   }
+// };
+
+const updateMentee = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body;
+
+    // Parola varsa hash'le
+    if (updatedData.password) {
+      updatedData.password = await passwordHelper.passwordToHash(updatedData.password);
+    }
+
+    const updatedMentee = await Mentee.findByIdAndUpdate(
+      id,
+      updatedData,
+      { new: true } // new: true parametresi, güncellenmiş nesneyi döndürür.
+    );
+
+    // Eğer güncelleme sonucunda dönen değer null ise, mentee bulunamamış demektir.
+    if (!updatedMentee) {
+      return next(new ApiError("Mentee not found.", httpStatus.NOT_FOUND));
+    }
+
+    // Başarılı güncelleme
+    return ApiDataSuccess.send(
+      updatedData.password ? "Password changed successfully!" : "Profile updated successfully!",
+      httpStatus.OK, // Güncelleme başarılı olduğunda HTTP 200/OK dönmek daha uygun olur.
+      res,
+      updatedMentee
+    );
+  } catch (error) {
+    console.log("Update Error:", error);
+    return next(new ApiError(
+      "Something went wrong :(",
+      httpStatus.INTERNAL_SERVER_ERROR
+    ));
+  }
 };
 
 
@@ -245,6 +312,7 @@ module.exports = {
 
     register,
     login,
+    updateMentee,
     googleLogin,
     getMentees,
     getMentee,
