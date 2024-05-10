@@ -29,6 +29,10 @@ router
   .get(menteeController.getMentee)
 
 router
+  .route('/:id')
+  .patch(menteeController.updateMentee)
+
+router
   .route('/add-to-wishlist/:menteeId/:mentorId')
   .put(menteeController.addToWishlist)
 
