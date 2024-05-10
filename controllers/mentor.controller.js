@@ -156,8 +156,7 @@ const updateMentor = async (req, res, next) => {
       return ApiDataSuccess.send(
         "Password changed successfully!",
         httpStatus.CREATED,
-        res,
-        userExist
+        res
       );
     }
 
