@@ -77,10 +77,13 @@ const register = async (req, res, next) => {
       surname: req.body.surname,
       email: req.body.email,
       password: mentorPassword,
+      jobTitle: req.body.jobTitle,
       category: req.body.category,
       interests: req.body.interests,
       desc: req.body.desc,
       image: `${basePath}${fileName}`,
+      github: req.body.github,
+      linkedin: req.body.linkedin
     });
 
     const mentor = await newMentor.save();

@@ -6,16 +6,20 @@ const mentorSchema = new mongoose.Schema(
         category:{
             type: String,
             ref: 'Category',
+            required: true
         },
         interests:[{
             type: String,
             ref: 'Interest',
+            required: true
         }],
-        experience: {
-            type: Number,
+        jobTitle: {
+            type: String,
+            required: true
         },
         price: {
             type: Number,
+            required: true
         },
         rating: {
             type: Number,
@@ -26,8 +30,17 @@ const mentorSchema = new mongoose.Schema(
             ref: 'Review',
         }],
         image: {
-            type: String
+            type: String,
+            required: true
         },
+        github:{
+            type: String,
+            required: true
+        },
+        linkedin:{
+            type: String,
+            required: true
+        }
     },
     { discriminatorKey: 'kind' }
 )
