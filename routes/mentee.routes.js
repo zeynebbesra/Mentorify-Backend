@@ -32,7 +32,6 @@ router
   .route("/remove-from-wishlist/:menteeId/:mentorId")
   .delete(menteeController.removeFromWishlist);
 
-
 router
   .route('/:id')
   .patch(menteeController.updateMentee)
@@ -50,6 +49,3 @@ router
   .get(menteeController.getWishlist)
 
 module.exports = router
-router.route("/wishlist/:menteeId").get(menteeController.getWishlist);
-
-module.exports = router;
