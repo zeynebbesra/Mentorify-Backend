@@ -83,7 +83,8 @@ const register = async (req, res, next) => {
       desc: req.body.desc,
       image: `${basePath}${fileName}`,
       github: req.body.github,
-      linkedin: req.body.linkedin
+      linkedin: req.body.linkedIn,
+      price: req.body.price,
     });
 
     const mentor = await newMentor.save();
@@ -143,7 +144,7 @@ const login = async (req, res, next) => {
 const updateMentor = async (req, res, next) => {
   try {
     const mentorExist = await Mentor.findById(req.params.id);
-    console.log(req.body)
+    console.log(req.body);
     if (!mentorExist) {
       return next(new ApiError("Mentor not found.", httpStatus.NOT_FOUND));
     }
@@ -178,7 +179,7 @@ const updateMentor = async (req, res, next) => {
       },
       { new: true }
     );
-    console.log(req.body)
+    console.log(req.body);
 
     if (!updatedMentor) {
       return next(
@@ -201,7 +202,7 @@ const updateMentor = async (req, res, next) => {
         "Something went wrong :(",
         httpStatus.BAD_REQUEST,
         error.message,
-        console.log("error",error)
+        console.log("error", error)
       )
     );
   }
