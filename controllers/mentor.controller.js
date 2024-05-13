@@ -7,6 +7,7 @@ const { createLoginToken } = require("../helpers/jwt.helper");
 const passwordHelper = require("../helpers/password.helper");
 const validatePassword = require("../helpers/passwordValidator.helper");
 const NewApiDataSuccess = require("../responses/success/api-success2");
+const { uploadImage } = require('../helpers/uploadImage.helper');
 
 //Get Mentors
 const getMentors = async (req, res, next) => {
@@ -62,15 +63,25 @@ const register = async (req, res, next) => {
   try {
     validatePassword(req.body.password);
 
-    const file = req.file;
-    if (!file)
-      return res
-        .status(404)
-        .json({ message: "There is no image in the request" });
+    // const file = req.file;
+    // if (!file)
+    //   return res
+    //     .status(404)
+    //     .json({ message: "There is no image in the request" });
 
-    const fileName = req.file.filename;
+    // const fileName = req.file.filename;
 
-    const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
+    // const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
+
+    const imagePath = uploadImage(req)
+    if(!imagePath) {
+      return next(
+        new ApiError(
+          "No image file provided",
+          httpStatus.BAD_REQUEST
+        )
+      );
+    }
 
     const newMentor = new Mentor({
       name: req.body.name,
@@ -81,7 +92,7 @@ const register = async (req, res, next) => {
       category: req.body.category,
       interests: req.body.interests,
       desc: req.body.desc,
-      image: `${basePath}${fileName}`,
+      image: imagePath,
       github: req.body.github,
       linkedin: req.body.linkedIn,
       price: req.body.price,
@@ -164,6 +175,8 @@ const updateMentor = async (req, res, next) => {
       );
     }
 
+    const imagePath = uploadImage(req, mentorExist.image);
+
     const updatedMentor = await Mentor.findByIdAndUpdate(
       req.params.id,
       {
@@ -174,7 +187,9 @@ const updateMentor = async (req, res, next) => {
         desc: req.body.desc,
         category: req.body.category,
         interest: req.body.interest,
-        experience: req.body.experience,
+        image: imagePath,
+        github: req.body.github,
+        linkedin: req.body.linkedIn,
         price: req.body.price,
       },
       { new: true }

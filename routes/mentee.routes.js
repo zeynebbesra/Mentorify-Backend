@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("../utils/passport");
 const menteeController = require("../controllers/mentee.controller");
+const {uploadOptions} = require('../helpers/uploadImage.helper')
 
 router.route("/register").post(menteeController.register);
 
@@ -32,9 +33,12 @@ router
   .route("/remove-from-wishlist/:menteeId/:mentorId")
   .delete(menteeController.removeFromWishlist);
 
-router
-  .route('/:id')
-  .patch(menteeController.updateMentee)
+// router
+//   .route('/:id')
+//   .patch(menteeController.updateMentee)
+
+router.patch('/:id', uploadOptions.single('image'), menteeController.updateMentee);
+
 
 router
   .route('/add-to-wishlist/:menteeId/:mentorId')

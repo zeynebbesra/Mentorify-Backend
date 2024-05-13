@@ -10,7 +10,10 @@ const menteeSchema = new mongoose.Schema(
         wishlist: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Mentor',
-        }]
+        }],
+        image: {
+            type: String
+        },
     },
     { discriminatorKey: 'kind' }
 )
