@@ -57,6 +57,7 @@ const mentorRouter = require("./routes/mentor.routes");
 const menteeRouter = require("./routes/mentee.routes");
 const categoryRouter = require("./routes/category.routes");
 const messageRouter = require("./routes/message.routes");
+const paymentRouter = require("./routes/payment.routes.js")
 
 const api = process.env.API_URL;
 
@@ -64,6 +65,7 @@ app.use(`${api}/mentors`, mentorRouter);
 app.use(`${api}/mentees`, menteeRouter);
 app.use(`${api}/categories`, categoryRouter);
 app.use(`${api}/messages`, messageRouter);
+app.use(`${api}/payments`,paymentRouter)
 
 //db connection
 connection();
