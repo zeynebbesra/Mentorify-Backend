@@ -11,6 +11,14 @@ const menteeSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Mentor',
         }],
+        applications: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Mentor',
+        }],
+        approvesMentors: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Mentor',
+        }],
         image: {
             type: String
         },

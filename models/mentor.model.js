@@ -40,7 +40,15 @@ const mentorSchema = new mongoose.Schema(
         linkedin:{
             type: String,
             required: true
-        }
+        },
+        applicants: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Mentee',
+        }],
+        approvedMentees: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Mentee'
+        }]
     },
     { discriminatorKey: 'kind' }
 )
