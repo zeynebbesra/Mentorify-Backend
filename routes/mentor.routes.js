@@ -2,14 +2,15 @@ const express = require('express')
 const mentorController = require('../controllers/mentor.controller')
 const router = express.Router()
 const {uploadOptions} = require('../helpers/uploadImage.helper')
+const authenticateUser = require('../middlewares/authMiddleware');
 
 router
     .route('/')
     .get(mentorController.getMentors)
 
-router.post('/register', uploadOptions.single('image'), mentorController.register);
+router.post('/register', uploadOptions.single('image'), mentorController.register)
 
-router.patch('/:id', uploadOptions.single('image'), mentorController.updateMentor);
+router.patch('/:id', uploadOptions.single('image'), mentorController.updateMentor)
     
 
 router
@@ -27,5 +28,11 @@ router
 router
     .route('/:id')
     .get(mentorController.getMentor)
+
+router.get('/applicants', authenticateUser, mentorController.getApplicants)
+
+router.post('/applicants/approve', authenticateUser, mentorController.approveMentee)
+
+router.post('/applicants/reject', authenticateUser, mentorController.rejectMentee)
 
 module.exports = router

@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const ApiError = require("../responses/error/api-error");
 const ApiDataSuccess = require("../responses/success/api-success");
 const Mentor = require("../models/mentor.model");
+const Mentee = require('../models/mentee.model');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createLoginToken } = require("../helpers/jwt.helper");
 const passwordHelper = require("../helpers/password.helper");
 const validatePassword = require("../helpers/passwordValidator.helper");
@@ -212,6 +214,74 @@ const deleteMentor = async (req, res, next) => {
   }
 };
 
+
+//view applicants list
+const getApplicants = async (req, res, next) => {
+  try {
+      const mentor = await Mentor.findById(req.user._id).populate('applicants');
+      NewApiDataSuccess.send("Mentor's applicants list loaded", httpStatus.OK, res, mentor.applicants);
+  } catch (error) {
+      return next(new ApiError("Error loading mentor's applicants list", httpStatus.INTERNAL_SERVER_ERROR));
+  }
+};
+
+//Approve Mentee
+const approveMentee = async (req, res, next) => {
+  const { menteeId, paymentIntentId } = req.body;
+  try {
+      const mentor = await Mentor.findById(req.user._id);
+
+      if (!mentor.applicants.includes(menteeId)) {
+          return next(new ApiError("Mentee not found in applicants list", httpStatus.NOT_FOUND));
+      }
+
+      // Ödeme niyetini onayla
+      const paymentIntent = await stripe.paymentIntents.confirm(paymentIntentId);
+
+      // Ödeme başarılıysa işlemleri tamamla
+      if (paymentIntent.status === 'succeeded') {
+          await Mentor.findByIdAndUpdate(req.user._id, {
+              $pull: { applicants: menteeId },
+              $push: { approvedMentees: menteeId }
+          });
+
+          await Mentee.findByIdAndUpdate(menteeId, {
+              $push: { approvedMentors: req.user._id }
+          });
+
+          NewApiDataSuccess.send("Mentee approved and payment completed", httpStatus.OK, res, { menteeId });
+      } else {
+          throw new Error('Payment not successful');
+      }
+  } catch (error) {
+      return next(new ApiError("An error occurred while approving mentee", httpStatus.INTERNAL_SERVER_ERROR));
+  }
+};
+
+//Reject Mentee
+
+const rejectMentee = async (req, res, next) => {
+  const { menteeId, paymentIntentId } = req.body;
+  try {
+      const mentor = await Mentor.findById(req.user._id);
+
+      if (!mentor.applicants.includes(menteeId)) {
+          return next(new ApiError("Mentee not found in applicants list", httpStatus.NOT_FOUND));
+      }
+
+      await stripe.paymentIntents.cancel(paymentIntentId);
+
+      await Mentor.findByIdAndUpdate(req.user._id, {
+          $pull: { applicants: menteeId }
+      });
+
+      NewApiDataSuccess.send("Mentee rejected and payment cancelled", httpStatus.OK, res, { menteeId });
+  } catch (error) {
+      return next(new ApiError("An error occurred while rejecting mentee", httpStatus.INTERNAL_SERVER_ERROR));
+  }
+};
+
+
 module.exports = {
   register,
   login,
@@ -219,4 +289,7 @@ module.exports = {
   getMentors,
   deleteMentor,
   getMentor,
+  getApplicants,
+  approveMentee,
+  rejectMentee
 };
