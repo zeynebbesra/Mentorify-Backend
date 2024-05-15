@@ -15,7 +15,7 @@ const menteeSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Mentor',
         }],
-        approvesMentors: [{
+        approvedMentors: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Mentor',
         }],
