@@ -8,6 +8,8 @@ const passwordHelper = require("../helpers/password.helper");
 const validatePassword = require("../helpers/passwordValidator.helper");
 const NewApiDataSuccess = require("../responses/success/api-success2");
 const { uploadImage } = require('../helpers/uploadImage.helper');
+// const { application } = require("express");
+
 
 //Get Mentees
 const getMentees = async (req, res, next) => {
@@ -146,8 +148,7 @@ const googleLogin = (req, res, next) => {
   );
 };
 
-
-
+//Update mentee
 const updateMentee = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -248,11 +249,45 @@ const getWishlist = async(req, res, next) => {
     }
 }
 
-//Payment method
+// Get applications
+const getApplications = async (req, res, next) => {
+  try {
+      const mentee = await Mentee.findById(req.user._id).populate('applications');
+      NewApiDataSuccess.send("Mentee's applications list loaded", httpStatus.OK, res, mentee.applications);
+  } catch (error) {
+      return next(new ApiError("Error loading mentee's applications list", httpStatus.INTERNAL_SERVER_ERROR));
+  }
+};
+
+// Add mentor to mentee's applications
+const addMentorToList = async (req, res, next) => {
+  const { mentorId } = req.body;
+  try {
+      const mentee = await Mentee.findByIdAndUpdate(req.user._id, {
+          $push: { applications: mentorId }
+      }, { new: true }).populate('applications');
+      NewApiDataSuccess.send("Mentor added to applications", httpStatus.OK, res, mentee);
+  } catch (error) {
+      return next(new ApiError("An error occurred while adding mentor", httpStatus.INTERNAL_SERVER_ERROR));
+  }
+};
+
+//remove mentor from the list
+const removeMentorFromList = async (req, res, next) => {
+  const { mentorId } = req.params;
+  try {
+      const mentee = await Mentee.findByIdAndUpdate(req.user._id, {
+          $pull: { applications: mentorId }
+      }, { new: true }).populate('applications');
+      NewApiDataSuccess.send("Mentor removed from applications", httpStatus.OK, res, mentee);
+  } catch (error) {
+      return next(new ApiError("An error occurred while removing mentor", httpStatus.INTERNAL_SERVER_ERROR));
+  }
+};
+
 
 
 module.exports = {
-
     register,
     login,
     updateMentee,
@@ -261,5 +296,8 @@ module.exports = {
     getMentee,
     addToWishlist,
     removeFromWishlist,
-    getWishlist
+    getWishlist,
+    getApplications,
+    addMentorToList,
+    removeMentorFromList
 }

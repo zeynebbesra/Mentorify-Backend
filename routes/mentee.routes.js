@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require("../utils/passport");
 const menteeController = require("../controllers/mentee.controller");
 const {uploadOptions} = require('../helpers/uploadImage.helper')
+const authenticateUser = require('../middlewares/authMiddleware');
 
 router.route("/register").post(menteeController.register);
 
@@ -39,7 +40,6 @@ router
 
 router.patch('/:id', uploadOptions.single('image'), menteeController.updateMentee);
 
-
 router
   .route('/add-to-wishlist/:menteeId/:mentorId')
   .put(menteeController.addToWishlist)
@@ -51,5 +51,11 @@ router
 router
   .route('/wishlist/:menteeId')
   .get(menteeController.getWishlist)
+
+router.get('/applications', authenticateUser, menteeController.getApplications);
+
+router.post('/applications', authenticateUser, menteeController.addMentorToList);
+
+router.delete('/applications/:mentorId', authenticateUser, menteeController.removeMentorFromList);
 
 module.exports = router
