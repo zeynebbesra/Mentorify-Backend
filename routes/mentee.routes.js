@@ -52,9 +52,17 @@ router
   .route('/wishlist/:menteeId')
   .get(menteeController.getWishlist)
 
-router.get('/applications', authenticateUser, menteeController.getApplications);
+// router.get('/applications', authenticateUser, menteeController.getApplications);
 
-router.post('/applications', authenticateUser, menteeController.addMentorToList);
+router.get('/applications', (req, res, next) => {
+  console.log('Route /applications hit');  // Eklenen log
+  next();
+}, authenticateUser, (req, res, next) => {
+  console.log('Middleware passed');  // Eklenen log
+  next();
+}, menteeController.getApplications);
+
+router.post('/applications/:mentorId', authenticateUser, menteeController.addMentorToList);
 
 router.delete('/applications/:mentorId', authenticateUser, menteeController.removeMentorFromList);
 

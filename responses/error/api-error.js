@@ -1,18 +1,36 @@
+// class ApiError extends Error {
+//     constructor(message, statusCode){
+//         super(message)
+//         this.statusCode = statusCode
+//     }
+
+//     toJSON(){
+//         return{
+//             error: {
+//                 message: this.message || "Something went wrong"
+//             },
+//             success: false,
+//             statusCode: this.statusCode
+//         }
+//     }
+// }
+
+// module.exports = ApiError
+
+
 class ApiError extends Error {
-    constructor(message, statusCode){
-        super(message)
-        this.statusCode = statusCode
+    constructor(message, statusCode) {
+        super(message);
+        this.statusCode = statusCode;
     }
 
-    toJSON(){
-        return{
-            error: {
-                message: this.message || "Something went wrong"
-            },
+    toJSON() {
+        return {
+            message: this.message,
+            statusCode: this.statusCode,
             success: false,
-            statusCode: this.statusCode
-        }
+        };
     }
 }
 
-module.exports = ApiError
+module.exports = ApiError;

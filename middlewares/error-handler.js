@@ -1,12 +1,35 @@
-const httpStatus = require('http-status')
-const ApiError = require('../responses/error/api-error')
+// const httpStatus = require('http-status')
+// const ApiError = require('../responses/error/api-error')
+
+// const ErrorHandler = (err, req, res, next) => {
+
+//     if (err instanceof ApiError){
+//         return res
+//             .status(err.statusCode || httpStatus.INTERNAL_SERVER_ERROR)
+//             .json(err.toJSON())
+//     }
+
+//     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+//         error: {
+//             message: 'Internal Server Error',
+//         },
+//         success: false,
+//         statusCode: httpStatus.INTERNAL_SERVER_ERROR
+//     })
+// }
+
+// module.exports = ErrorHandler
+
+
+const httpStatus = require('http-status');
+const ApiError = require('../responses/error/api-error');
 
 const ErrorHandler = (err, req, res, next) => {
-
-    if (err instanceof ApiError){
+    console.error(err.stack);
+    if (err instanceof ApiError) {
         return res
             .status(err.statusCode || httpStatus.INTERNAL_SERVER_ERROR)
-            .json(err.toJSON())
+            .json(err.toJSON());
     }
 
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
@@ -15,7 +38,7 @@ const ErrorHandler = (err, req, res, next) => {
         },
         success: false,
         statusCode: httpStatus.INTERNAL_SERVER_ERROR
-    })
-}
+    });
+};
 
-module.exports = ErrorHandler
+module.exports = ErrorHandler;

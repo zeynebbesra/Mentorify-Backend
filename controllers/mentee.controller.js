@@ -250,14 +250,37 @@ const getWishlist = async(req, res, next) => {
 }
 
 // Get applications
+// const getApplications = async (req, res, next) => {
+//   try {
+//       console.log("req.user:", req.user)
+//       const mentee = await Mentee.findById(req.user._id).populate('applications');
+//       console.log("Mentee:",mentee)
+//       NewApiDataSuccess.send("Mentee's applications list loaded", httpStatus.OK, res, mentee.applications);
+//   } catch (error) {
+//       return next(new ApiError("Error loading mentee's applications list", httpStatus.INTERNAL_SERVER_ERROR), error.message);
+//   }
+// };
+
 const getApplications = async (req, res, next) => {
   try {
+      console.log("getApplications called");  // Eklenen log
+      console.log("req.user:", req.user);  // Eklenen log
       const mentee = await Mentee.findById(req.user._id).populate('applications');
+      console.log("Mentee:", mentee);  // Eklenen log
+
+      if (!mentee) {
+          return next(new ApiError("Mentee not found", httpStatus.NOT_FOUND));
+      }
+
       NewApiDataSuccess.send("Mentee's applications list loaded", httpStatus.OK, res, mentee.applications);
   } catch (error) {
-      return next(new ApiError("Error loading mentee's applications list", httpStatus.INTERNAL_SERVER_ERROR));
+      console.error("Error:", error);  // Eklenen log
+      return next(new ApiError("Error loading mentee's applications list", httpStatus.INTERNAL_SERVER_ERROR), error.message);
   }
 };
+
+
+
 
 // Add mentor to mentee's applications
 const addMentorToList = async (req, res, next) => {
