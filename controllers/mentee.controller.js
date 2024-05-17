@@ -3,6 +3,7 @@ const ApiError = require("../responses/success/api-success");
 const bcrypt = require("bcrypt");
 const ApiDataSuccess = require("../responses/success/api-success");
 const Mentee = require("../models/mentee.model");
+const Mentor = require("../models/mentor.model");
 const { createLoginToken } = require("../helpers/jwt.helper");
 const passwordHelper = require("../helpers/password.helper");
 const validatePassword = require("../helpers/passwordValidator.helper");
@@ -250,61 +251,146 @@ const getWishlist = async(req, res, next) => {
 }
 
 // Get applications
-// const getApplications = async (req, res, next) => {
+// const getAppliedMentors = async (req, res, next) => {
+//   console.log("USEEERR",req.user)
 //   try {
-//       console.log("req.user:", req.user)
+//       // Mentee'nin applications alanını popülate et
 //       const mentee = await Mentee.findById(req.user._id).populate('applications');
-//       console.log("Mentee:",mentee)
-//       NewApiDataSuccess.send("Mentee's applications list loaded", httpStatus.OK, res, mentee.applications);
+//       if (!mentee) {
+//           return res.status(404).json({ error: 'Mentee not found' });
+//       }
+
+//       // Başvurulan mentorları geri döndür
+//       res.status(200).json({ appliedMentors: mentee.applications });
 //   } catch (error) {
-//       return next(new ApiError("Error loading mentee's applications list", httpStatus.INTERNAL_SERVER_ERROR), error.message);
+//       console.error('Error fetching applied mentors:', error);
+//       return res.status(500).json({ error: 'Internal server error' });
 //   }
 // };
 
-const getApplications = async (req, res, next) => {
+
+const getAppliedMentors = async (req, res, next) => {
+  const menteeId = req.params.menteeId;
+
+  // console.log("getAppliedMentors: start");
   try {
-      console.log("getApplications called");  // Eklenen log
-      console.log("req.user:", req.user);  // Eklenen log
-      const mentee = await Mentee.findById(req.user._id).populate('applications');
-      console.log("Mentee:", mentee);  // Eklenen log
+    const mentee = await Mentee.findById(menteeId)
+      .populate({
+        path: 'applications',
+        select: 'name email' // Burada sadece name ve email alanlarını döndürüyorum
+      });
+    // console.log("getAppliedMentors - mentee:", mentee);
 
-      if (!mentee) {
-          return next(new ApiError("Mentee not found", httpStatus.NOT_FOUND));
-      }
+    if (!mentee) {
+      console.error('Mentee not found');
+      return next(new ApiError('Mentee not found', httpStatus.NOT_FOUND));
+    }
 
-      NewApiDataSuccess.send("Mentee's applications list loaded", httpStatus.OK, res, mentee.applications);
+    if (mentee.applications.length === 0) {
+      return NewApiDataSuccess.send('No mentors applied yet', httpStatus.OK, res, []);
+    }
+
+    NewApiDataSuccess.send('Applied mentors fetched successfully', httpStatus.OK, res, mentee.applications);
+    // console.log("getAppliedMentors: end");
   } catch (error) {
-      console.error("Error:", error);  // Eklenen log
-      return next(new ApiError("Error loading mentee's applications list", httpStatus.INTERNAL_SERVER_ERROR), error.message);
+    console.error('Error fetching applied mentors:', error);
+    return next(new ApiError('Internal Server Error', httpStatus.INTERNAL_SERVER_ERROR));
   }
 };
 
 
 
+// const applyToMentor = async (req, res, next) => {
+//   try {
+//       const { mentorId } = req.body;
+//       const menteeId = req.user._id;
 
-// Add mentor to mentee's applications
-const addMentorToList = async (req, res, next) => {
+//       const mentor = await Mentor.findById(mentorId);
+//       if (!mentor) {
+//           return next(new ApiError("Mentor not found", httpStatus.NOT_FOUND));
+//       }
+
+//       // Mentor'un applicants listesine mentee ekle
+//       if (!mentor.applicants.includes(menteeId)) {
+//           mentor.applicants.push(menteeId);
+//       } else {
+//           return next(new ApiError("Already applied", httpStatus.BAD_REQUEST));
+//       }
+
+//       await mentor.save();
+
+//       // Mentee'nin applications listesine mentor ekle
+//       const mentee = await Mentee.findById(menteeId);
+//       if (!mentee.applications.includes(mentorId)) {
+//           mentee.applications.push(mentorId);
+//       }
+
+//       await mentee.save();
+
+//       NewApiDataSuccess.send("Application submitted successfully", httpStatus.OK, res);
+//   } catch (error) {
+//       return next(new ApiError("Error submitting application", httpStatus.INTERNAL_SERVER_ERROR));
+//   }
+// };
+
+
+const applyToMentor = async (req, res, next) => {
+  const menteeId = req.params.menteeId;
   const { mentorId } = req.body;
+
   try {
-      const mentee = await Mentee.findByIdAndUpdate(req.user._id, {
-          $push: { applications: mentorId }
-      }, { new: true }).populate('applications');
-      NewApiDataSuccess.send("Mentor added to applications", httpStatus.OK, res, mentee);
+    const mentor = await Mentor.findById(mentorId);
+    if (!mentor) {
+      return next(new ApiError("Mentor not found", httpStatus.NOT_FOUND));
+    }
+
+    if (!mentor.applicants.includes(menteeId)) {
+      mentor.applicants.push(menteeId);
+    } else {
+      return next(new ApiError("Already applied", httpStatus.BAD_REQUEST));
+    }
+
+    await mentor.save();
+
+    const mentee = await Mentee.findById(menteeId);
+    if (!mentee.applications.includes(mentorId)) {
+      mentee.applications.push(mentorId);
+    }
+
+    await mentee.save();
+
+    NewApiDataSuccess.send("Application submitted successfully", httpStatus.OK, res);
   } catch (error) {
-      return next(new ApiError("An error occurred while adding mentor", httpStatus.INTERNAL_SERVER_ERROR));
+    return next(new ApiError("Error submitting application", httpStatus.INTERNAL_SERVER_ERROR));
   }
 };
+
 
 //remove mentor from the list
+// const removeMentorFromList = async (req, res, next) => {
+//   const { mentorId } = req.params;
+//   try {
+//       const mentee = await Mentee.findByIdAndUpdate(req.user._id, {
+//           $pull: { applications: mentorId }
+//       }, { new: true }).populate('applications');
+//       NewApiDataSuccess.send("Mentor removed from applications", httpStatus.OK, res, mentee);
+//   } catch (error) {
+//       return next(new ApiError("An error occurred while removing mentor", httpStatus.INTERNAL_SERVER_ERROR));
+//   }
+// };
+
 const removeMentorFromList = async (req, res, next) => {
+  const menteeId = req.params.menteeId;
   const { mentorId } = req.params;
+
   try {
-      const mentee = await Mentee.findByIdAndUpdate(req.user._id, {
-          $pull: { applications: mentorId }
-      }, { new: true }).populate('applications');
-      NewApiDataSuccess.send("Mentor removed from applications", httpStatus.OK, res, mentee);
+    const mentee = await Mentee.findByIdAndUpdate(menteeId, {
+      $pull: { applications: mentorId }
+    }, { new: true }).populate('applications');
+
+    NewApiDataSuccess.send("Mentor removed from applications", httpStatus.OK, res, mentee);
   } catch (error) {
-      return next(new ApiError("An error occurred while removing mentor", httpStatus.INTERNAL_SERVER_ERROR));
+    return next(new ApiError("An error occurred while removing mentor", httpStatus.INTERNAL_SERVER_ERROR));
   }
 };
 
@@ -320,7 +406,7 @@ module.exports = {
     addToWishlist,
     removeFromWishlist,
     getWishlist,
-    getApplications,
-    addMentorToList,
+    getAppliedMentors,
+    applyToMentor,
     removeMentorFromList
 }

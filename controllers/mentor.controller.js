@@ -96,7 +96,7 @@ const register = async (req, res, next) => {
       desc: req.body.desc,
       image: imagePath,
       github: req.body.github,
-      linkedin: req.body.linkedIn,
+      linkedin: req.body.linkedin,
       price: req.body.price,
     });
 
@@ -216,20 +216,56 @@ const deleteMentor = async (req, res, next) => {
 
 
 //view applicants list
+// const getApplicants = async (req, res, next) => {
+//   console.log("user:",req.user)
+//   try {
+//       const mentor = await Mentor.findById(req.user._id).populate('applicants');
+//       NewApiDataSuccess.send("Mentor's applicants list loaded", httpStatus.OK, res, mentor.applicants);
+//   } catch (error) {
+//       return next(new ApiError("Error loading mentor's applicants list", httpStatus.INTERNAL_SERVER_ERROR));
+//   }
+// };
+
+// const getApplicants = async (req, res, next) => {
+//   try {
+//     console.log("User:",req.user)
+//       const mentor = await Mentor.findById(req.user._id).populate('applicants');
+//       if (!mentor) {
+//           return next(new ApiError("Mentor not found", httpStatus.NOT_FOUND));
+//       }
+//       NewApiDataSuccess.send("Mentor's applicants list loaded", httpStatus.OK, res, mentor.applicants);
+//   } catch (error) {
+//       return next(new ApiError("Error loading mentor's applicants list", httpStatus.INTERNAL_SERVER_ERROR));
+//   }
+// };
+
 const getApplicants = async (req, res, next) => {
   try {
-      const mentor = await Mentor.findById(req.user._id).populate('applicants');
-      NewApiDataSuccess.send("Mentor's applicants list loaded", httpStatus.OK, res, mentor.applicants);
+    console.log("User:", req.user);
+    const mentor = await Mentor.findById(req.params.mentorId).populate('applicants');
+    console.log("Mentor with applicants:", mentor);
+
+    if (!mentor) {
+      console.error("Mentor not found");
+      return res.status(404).json({ error: "Mentor not found" });
+    }
+
+    res.status(200).json({ applicants: mentor.applicants });
   } catch (error) {
-      return next(new ApiError("Error loading mentor's applicants list", httpStatus.INTERNAL_SERVER_ERROR));
+    console.error("Error loading mentor's applicants list:", error);
+    return res.status(500).json({ error: "Error loading mentor's applicants list" });
   }
 };
+
+
+
+
 
 //Approve Mentee
 const approveMentee = async (req, res, next) => {
   const { menteeId, paymentIntentId } = req.body;
   try {
-      const mentor = await Mentor.findById(req.user._id);
+      const mentor = await Mentor.findById(req.params.mentorId);
 
       if (!mentor.applicants.includes(menteeId)) {
           return next(new ApiError("Mentee not found in applicants list", httpStatus.NOT_FOUND));
@@ -263,7 +299,7 @@ const approveMentee = async (req, res, next) => {
 const rejectMentee = async (req, res, next) => {
   const { menteeId, paymentIntentId } = req.body;
   try {
-      const mentor = await Mentor.findById(req.user._id);
+      const mentor = await Mentor.findById(req.params.mentorId);
 
       if (!mentor.applicants.includes(menteeId)) {
           return next(new ApiError("Mentee not found in applicants list", httpStatus.NOT_FOUND));

@@ -85,6 +85,7 @@ const errorHandler = require("./middlewares/error-handler");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const authenticateUser = require('./middlewares/authMiddleware.js');
 
 const app = require("./socket/socket.js").app;
 const server = require("./socket/socket.js").server;
@@ -134,6 +135,10 @@ app.use(`${api}/mentees`, menteeRouter);
 app.use(`${api}/categories`, categoryRouter);
 app.use(`${api}/messages`, messageRouter);
 app.use(`${api}/payments`, paymentRouter);
+
+app.get('/test-auth', authenticateUser, (req, res) => {
+  res.status(200).json({ user: req.user });
+});
 
 // Hata işleyici middleware'i en sona ekleyin
 app.use(errorHandler);

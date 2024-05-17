@@ -29,10 +29,10 @@ router
     .route('/:id')
     .get(mentorController.getMentor)
 
-router.get('/applicants', authenticateUser, mentorController.getApplicants)
+router.get('/applicants/:mentorId', mentorController.getApplicants)
 
-router.post('/applicants/approve', authenticateUser, mentorController.approveMentee)
+router.post('/applicants/approve/:mentorId', mentorController.approveMentee)
 
-router.post('/applicants/reject', authenticateUser, mentorController.rejectMentee)
+router.post('/applicants/reject/:mentorId', mentorController.rejectMentee)
 
 module.exports = router
