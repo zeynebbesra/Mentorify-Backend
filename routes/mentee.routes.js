@@ -63,6 +63,10 @@ router
   .get(menteeController.getAppliedMentors)
 
 router
+  .route('/applications/payment/:menteeId')
+  .post(menteeController.processPayment)
+
+router
   .route('/applications/:menteeId')
   .post(menteeController.applyToMentor)
 

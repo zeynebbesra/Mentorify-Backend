@@ -259,11 +259,10 @@ const getApplicants = async (req, res, next) => {
 
 
 
-
-
 //Approve Mentee
+
 const approveMentee = async (req, res, next) => {
-  const { menteeId, paymentIntentId } = req.body;
+  const { menteeId } = req.body;
   try {
       const mentor = await Mentor.findById(req.params.mentorId);
 
@@ -271,28 +270,22 @@ const approveMentee = async (req, res, next) => {
           return next(new ApiError("Mentee not found in applicants list", httpStatus.NOT_FOUND));
       }
 
-      // Ödeme niyetini onayla
-      const paymentIntent = await stripe.paymentIntents.confirm(paymentIntentId);
+      await Mentor.findByIdAndUpdate(req.user._id, {
+          $pull: { applicants: menteeId },
+          $push: { approvedMentees: menteeId }
+      });
 
-      // Ödeme başarılıysa işlemleri tamamla
-      if (paymentIntent.status === 'succeeded') {
-          await Mentor.findByIdAndUpdate(req.user._id, {
-              $pull: { applicants: menteeId },
-              $push: { approvedMentees: menteeId }
-          });
+      await Mentee.findByIdAndUpdate(menteeId, {
+          $push: { approvedMentors: req.user._id }
+      });
 
-          await Mentee.findByIdAndUpdate(menteeId, {
-              $push: { approvedMentors: req.user._id }
-          });
-
-          NewApiDataSuccess.send("Mentee approved and payment completed", httpStatus.OK, res, { menteeId });
-      } else {
-          throw new Error('Payment not successful');
-      }
+      NewApiDataSuccess.send("Mentee approved successfully", httpStatus.OK, res, { menteeId });
   } catch (error) {
       return next(new ApiError("An error occurred while approving mentee", httpStatus.INTERNAL_SERVER_ERROR));
   }
 };
+
+
 
 //Reject Mentee
 

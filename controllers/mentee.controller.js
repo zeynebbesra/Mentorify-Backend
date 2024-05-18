@@ -298,40 +298,23 @@ const getAppliedMentors = async (req, res, next) => {
   }
 };
 
+// Process Payment
 
+const processPayment = async (req, res, next) => {
+  const { paymentIntentId } = req.body;
+  const { menteeId } = req.params;
+  try {
+      const paymentIntent = await stripe.paymentIntents.confirm(paymentIntentId);
 
-// const applyToMentor = async (req, res, next) => {
-//   try {
-//       const { mentorId } = req.body;
-//       const menteeId = req.user._id;
-
-//       const mentor = await Mentor.findById(mentorId);
-//       if (!mentor) {
-//           return next(new ApiError("Mentor not found", httpStatus.NOT_FOUND));
-//       }
-
-//       // Mentor'un applicants listesine mentee ekle
-//       if (!mentor.applicants.includes(menteeId)) {
-//           mentor.applicants.push(menteeId);
-//       } else {
-//           return next(new ApiError("Already applied", httpStatus.BAD_REQUEST));
-//       }
-
-//       await mentor.save();
-
-//       // Mentee'nin applications listesine mentor ekle
-//       const mentee = await Mentee.findById(menteeId);
-//       if (!mentee.applications.includes(mentorId)) {
-//           mentee.applications.push(mentorId);
-//       }
-
-//       await mentee.save();
-
-//       NewApiDataSuccess.send("Application submitted successfully", httpStatus.OK, res);
-//   } catch (error) {
-//       return next(new ApiError("Error submitting application", httpStatus.INTERNAL_SERVER_ERROR));
-//   }
-// };
+      if (paymentIntent.status === 'succeeded') {
+          NewApiDataSuccess.send("Payment completed successfully", httpStatus.OK, res, { menteeId });
+      } else {
+          throw new Error('Payment not successful');
+      }
+  } catch (error) {
+      return next(new ApiError("An error occurred while processing payment", httpStatus.INTERNAL_SERVER_ERROR));
+  }
+};
 
 
 const applyToMentor = async (req, res, next) => {
@@ -408,5 +391,6 @@ module.exports = {
     getWishlist,
     getAppliedMentors,
     applyToMentor,
-    removeMentorFromList
+    removeMentorFromList,
+    processPayment
 }
