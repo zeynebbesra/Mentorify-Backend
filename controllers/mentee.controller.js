@@ -265,30 +265,71 @@ const getWishlist = async (req, res, next) => {
 };
 
 
+// const getAppliedMentors = async (req, res, next) => {
+//   const menteeId = req.params.menteeId;
+
+//   try {
+//     const mentee = await Mentee.findById(menteeId)
+//       .populate({
+//         path: 'applications',
+//         select: 'name surname jobTitle image' 
+//       });
+
+//     if (!mentee) {
+//       console.error('Mentee not found');
+//       return next(new ApiError('Mentee not found', httpStatus.NOT_FOUND));
+//     }
+
+//     if (mentee.applications.length === 0) {
+//       return NewApiDataSuccess.send('No mentors applied yet', httpStatus.OK, res, []);
+//     }
+
+//     NewApiDataSuccess.send('Applied mentors fetched successfully', httpStatus.OK, res, mentee.applications);
+  
+//   } catch (error) {
+//     console.error('Error fetching applied mentors:', error);
+//     return next(new ApiError('Internal Server Error', httpStatus.INTERNAL_SERVER_ERROR));
+//   }
+// };
+
 
 const getAppliedMentors = async (req, res, next) => {
   const menteeId = req.params.menteeId;
 
-  // console.log("getAppliedMentors: start");
   try {
     const mentee = await Mentee.findById(menteeId)
       .populate({
         path: 'applications',
-        select: 'name surname jobTitle image' 
+        select: 'name surname jobTitle image applicants approvedMentees'
       });
-    // console.log("getAppliedMentors - mentee:", mentee);
 
     if (!mentee) {
       console.error('Mentee not found');
       return next(new ApiError('Mentee not found', httpStatus.NOT_FOUND));
     }
 
-    if (mentee.applications.length === 0) {
-      return NewApiDataSuccess.send('No mentors applied yet', httpStatus.OK, res, []);
+    const appliedMentors = mentee.applications.map(mentor => {
+      let status = 'pending';
+      if (mentor.approvedMentees.includes(menteeId)) {
+        status = 'approved';
+      } else if (!mentor.applicants.includes(menteeId)) {
+        status = 'rejected';
+      }
+      return {
+        name: mentor.name,
+        surname: mentor.surname,
+        jobTitle: mentor.jobTitle,
+        image: mentor.image,
+        status: status
+      };
+    });
+
+    if (appliedMentors.length === 0) {
+      return ApiDataSuccess.send('No mentors applied yet', httpStatus.OK, res, []);
     }
 
-    NewApiDataSuccess.send('Applied mentors fetched successfully', httpStatus.OK, res, mentee.applications);
-    // console.log("getAppliedMentors: end");
+    ApiDataSuccess.send('Applied mentors fetched successfully', httpStatus.OK, res, appliedMentors);
+  
   } catch (error) {
     console.error('Error fetching applied mentors:', error);
     return next(new ApiError('Internal Server Error', httpStatus.INTERNAL_SERVER_ERROR));
