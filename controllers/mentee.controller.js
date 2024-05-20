@@ -235,8 +235,6 @@ const removeFromWishlist = async(req,res,next) => {
 
 // Mentee'nin Wishlist'ini Görüntüleme
 
-// Mentee'nin Wishlist'ini Görüntüleme
-
 const getWishlist = async (req, res, next) => {
   const { menteeId } = req.params;
   try {
@@ -293,7 +291,7 @@ const getAppliedMentors = async (req, res, next) => {
     const mentee = await Mentee.findById(menteeId)
       .populate({
         path: 'applications',
-        select: 'name email' // Burada sadece name ve email alanlarını döndürüyorum
+        select: 'name surname jobTitle image' 
       });
     // console.log("getAppliedMentors - mentee:", mentee);
 
