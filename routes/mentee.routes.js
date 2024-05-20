@@ -9,6 +9,7 @@ router.route("/register").post(menteeController.register);
 
 router.route("/login").post(menteeController.login);
 
+
 // Google ile giriş yapma yolu
 router.get(
   "/auth/google",
@@ -18,7 +19,7 @@ router.get(
 // Google callback yolu
 router.get(
   "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login/mentee" }),
+  passport.authenticate("google", { failureRedirect: "/api/v1/mentees/login" }),
   menteeController.googleLogin
 );
 
