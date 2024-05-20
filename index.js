@@ -20,6 +20,7 @@ app.use(
     name: "session",
     keys: ["zeybes"],
     maxAge: 24 * 60 * 60 * 100,
+    sameSite: 'lax' // sameSite ayarını lax olarak belirleyin
   })
 );
 
@@ -28,9 +29,11 @@ app.use(passport.session());
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    methods: "GET,POST,PUT,DELETE",
+    origin: 'http://localhost:3000', 
     credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   })
 );
 
