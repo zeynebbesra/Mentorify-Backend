@@ -216,29 +216,6 @@ const deleteMentor = async (req, res, next) => {
 
 
 //view applicants list
-// const getApplicants = async (req, res, next) => {
-//   console.log("user:",req.user)
-//   try {
-//       const mentor = await Mentor.findById(req.user._id).populate('applicants');
-//       NewApiDataSuccess.send("Mentor's applicants list loaded", httpStatus.OK, res, mentor.applicants);
-//   } catch (error) {
-//       return next(new ApiError("Error loading mentor's applicants list", httpStatus.INTERNAL_SERVER_ERROR));
-//   }
-// };
-
-// const getApplicants = async (req, res, next) => {
-//   try {
-//     console.log("User:",req.user)
-//       const mentor = await Mentor.findById(req.user._id).populate('applicants');
-//       if (!mentor) {
-//           return next(new ApiError("Mentor not found", httpStatus.NOT_FOUND));
-//       }
-//       NewApiDataSuccess.send("Mentor's applicants list loaded", httpStatus.OK, res, mentor.applicants);
-//   } catch (error) {
-//       return next(new ApiError("Error loading mentor's applicants list", httpStatus.INTERNAL_SERVER_ERROR));
-//   }
-// };
-
 const getApplicants = async (req, res, next) => {
   try {
     console.log("User:", req.user);
@@ -281,7 +258,10 @@ const approveMentee = async (req, res, next) => {
 
       NewApiDataSuccess.send("Mentee approved successfully", httpStatus.OK, res, { menteeId });
   } catch (error) {
-      return next(new ApiError("An error occurred while approving mentee", httpStatus.INTERNAL_SERVER_ERROR));
+      return next(
+        new ApiError(console.log("ERROR:",error.message),
+        "An error occurred while approving mentee", 
+        httpStatus.INTERNAL_SERVER_ERROR));
   }
 };
 

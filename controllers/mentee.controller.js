@@ -4,12 +4,13 @@ const bcrypt = require("bcrypt");
 const ApiDataSuccess = require("../responses/success/api-success");
 const Mentee = require("../models/mentee.model");
 const Mentor = require("../models/mentor.model");
+const Review = require("../models/review.model")
 const { createLoginToken } = require("../helpers/jwt.helper");
 const passwordHelper = require("../helpers/password.helper");
 const validatePassword = require("../helpers/passwordValidator.helper");
 const NewApiDataSuccess = require("../responses/success/api-success2");
 const { uploadImage } = require('../helpers/uploadImage.helper');
-// const { application } = require("express");
+
 
 
 //Get Mentees
@@ -264,24 +265,6 @@ const getWishlist = async (req, res, next) => {
 };
 
 
-// Get applications
-// const getAppliedMentors = async (req, res, next) => {
-//   console.log("USEEERR",req.user)
-//   try {
-//       // Mentee'nin applications alanını popülate et
-//       const mentee = await Mentee.findById(req.user._id).populate('applications');
-//       if (!mentee) {
-//           return res.status(404).json({ error: 'Mentee not found' });
-//       }
-
-//       // Başvurulan mentorları geri döndür
-//       res.status(200).json({ appliedMentors: mentee.applications });
-//   } catch (error) {
-//       console.error('Error fetching applied mentors:', error);
-//       return res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
-
 
 const getAppliedMentors = async (req, res, next) => {
   const menteeId = req.params.menteeId;
@@ -363,19 +346,6 @@ const applyToMentor = async (req, res, next) => {
 };
 
 
-//remove mentor from the list
-// const removeMentorFromList = async (req, res, next) => {
-//   const { mentorId } = req.params;
-//   try {
-//       const mentee = await Mentee.findByIdAndUpdate(req.user._id, {
-//           $pull: { applications: mentorId }
-//       }, { new: true }).populate('applications');
-//       NewApiDataSuccess.send("Mentor removed from applications", httpStatus.OK, res, mentee);
-//   } catch (error) {
-//       return next(new ApiError("An error occurred while removing mentor", httpStatus.INTERNAL_SERVER_ERROR));
-//   }
-// };
-
 const removeMentorFromList = async (req, res, next) => {
   const menteeId = req.params.menteeId;
   const { mentorId } = req.params;
@@ -391,6 +361,128 @@ const removeMentorFromList = async (req, res, next) => {
   }
 };
 
+//Add review to mentor
+// const addReview = async (req,res,next) => {
+//   const {mentorId, menteeId} = req.params
+//   const {rating, comment} = req.body
+//   console.log("BODY:",req.body)
+//   try {
+//     const mentor = await Mentor.findById(mentorId)
+//     const mentee = await Mentee.findById(menteeId)
+//     console.log("MENTEE:",mentee)
+//     console.log("MENTOR:",mentor)
+//     if (!mentor || !mentee) {
+//       return next(
+//           new ApiError(
+//               "Mentor or Mentee not found",
+//               httpStatus.NOT_FOUND,
+//           )
+//       );
+//     }
+//     if (!mentee.approvedMentors.includes(mentorId)) {
+//       return next(
+//           new ApiError(
+//               "Mentee is not approved by this mentor",
+//               httpStatus.FORBIDDEN,
+//           )
+//       );
+//     }
+//     const newReview = new Review({
+//       mentee: menteeId,
+//       mentor: mentorId,
+//       rating,
+//       comment
+//     })
+
+//     await newReview.save()
+
+//     mentor.reviews.push(newReview._id);
+//     mentor.rating = (mentor.rating * mentor.reviews.length + rating) / (mentor.reviews.length + 1);
+//     await mentor.save();
+
+//     ApiDataSuccess.send("Review added successfully", httpStatus.CREATED, res, newReview);
+
+    
+//   } catch (error) {
+//     return next(
+//       new ApiError(
+//         console.log("ERROR:",error.message),
+//           "Something went wrong :(",
+//           httpStatus.INTERNAL_SERVER_ERROR,
+//       )
+//     );
+//   }
+// }
+
+const addReview = async (req, res, next) => {
+  const { mentorId, menteeId } = req.params;
+  const { rating, comment } = req.body;
+
+  console.log('BODY:', req.body);
+  console.log('MENTEE ID:', menteeId);
+  console.log('MENTOR ID:', mentorId);
+
+  try {
+      const mentor = await Mentor.findById(mentorId);
+      const mentee = await Mentee.findById(menteeId);
+
+      console.log('MENTEE:', mentee);
+      console.log('MENTOR:', mentor);
+
+      if (!mentor || !mentee) {
+          return next(
+              new ApiError(
+                  "Mentor or Mentee not found",
+                  httpStatus.NOT_FOUND,
+              )
+          );
+      }
+
+      // Mentee'nin onaylı mentorlar listesinde olup olmadığını kontrol et
+      if (!mentee.approvedMentors.includes(mentorId)) {
+          return next(
+              new ApiError(
+                  "Mentee is not approved by this mentor",
+                  httpStatus.FORBIDDEN,
+              )
+          );
+      }
+
+      const newReview = new Review({
+          mentee: menteeId,
+          mentor: mentorId,
+          rating,
+          comment
+      });
+
+      console.log("REVIEW:", newReview);
+
+      await newReview.save();
+
+      mentor.reviews.push(newReview._id);
+      console.log("REVIEWS ARRAY:", mentor.reviews);
+
+      // Mentor'un ratingini güncelleme mantığı düzeltilmeli
+      if (mentor.reviews.length > 1) {
+          mentor.rating = (mentor.rating * (mentor.reviews.length - 1) + rating) / mentor.reviews.length;
+      } else {
+          mentor.rating = rating;
+      }
+      console.log("NEW RATING:", mentor.rating);
+
+      await mentor.save();
+
+      ApiDataSuccess.send("Review added successfully", httpStatus.CREATED, res, newReview);
+  } catch (error) {
+      console.error('ERROR:', error);
+      return next(
+          new ApiError(
+              "Something went wrong :(",
+              httpStatus.INTERNAL_SERVER_ERROR,
+          )
+      );
+  }
+};
 
 
 module.exports = {
@@ -406,5 +498,6 @@ module.exports = {
     getAppliedMentors,
     applyToMentor,
     removeMentorFromList,
-    processPayment
+    processPayment,
+    addReview
 }

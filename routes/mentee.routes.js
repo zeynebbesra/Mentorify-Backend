@@ -73,4 +73,9 @@ router
 
 router.delete('/applications/:mentorId/remove-mentor/:mentorId',menteeController.removeMentorFromList);
 
+router
+  .route('/:mentorId/reviews/:menteeId')
+  .post(menteeController.addReview)
+
+
 module.exports = router
