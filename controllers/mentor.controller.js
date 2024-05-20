@@ -219,35 +219,18 @@ const deleteMentor = async (req, res, next) => {
 // View applicants list
 const getApplicants = async (req, res, next) => {
   try {
-    const mentor = await Mentor.findById(req.params.mentorId)
-      .populate({
-        path: 'applicants',
-        select: 'name surname email image'
-      })
-      .populate({
-        path: 'approvedMentees',
-        select: 'name surname email image'
-      });
-
-    console.log("Mentor with applicants and approved mentees:", mentor);
+    const mentor = await Mentor.findById(req.params.mentorId).populate('applicants');
+    console.log("Mentor with applicants:", mentor);
 
     if (!mentor) {
-      return next(
-        new ApiError("Mentor not found", httpStatus.NOT_FOUND)
-      );
+      console.error("Mentor not found");
+      return res.status(404).json({ error: "Mentor not found" });
     }
 
-    const response = {
-      applicants: mentor.applicants,
-      approvedMentees: mentor.approvedMentees
-    };
-
-    ApiDataSuccess.send("Mentor's applicants and approved mentees loaded", httpStatus.OK, res, response);
+    res.status(200).json({ applicants: mentor.applicants });
   } catch (error) {
     console.error("Error loading mentor's applicants list:", error);
-    return next(
-      new ApiError("Error loading mentor's applicants list", httpStatus.INTERNAL_SERVER_ERROR)
-    );
+    return res.status(500).json({ error: "Error loading mentor's applicants list" });
   }
 };
 
