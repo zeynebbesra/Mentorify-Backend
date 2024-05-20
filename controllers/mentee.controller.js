@@ -235,20 +235,36 @@ const removeFromWishlist = async(req,res,next) => {
 
 // Mentee'nin Wishlist'ini Görüntüleme
 
-const getWishlist = async(req, res, next) => {
-    const {menteeId} = req.params
-    try {
-        const mentee = await Mentee.findById(menteeId).populate('wishlist', 'name surname desc rating image')
-        ApiDataSuccess.send("Mentee's wish list loaded", httpStatus.OK, res, mentee)
-    } catch (error) {
-        return next(    
-            new ApiError(
-                "Something went wrong :(",
-                httpStatus.INTERNAL_SERVER_ERROR,
-            )
-        )
-    }
-}
+// Mentee'nin Wishlist'ini Görüntüleme
+
+const getWishlist = async (req, res, next) => {
+  const { menteeId } = req.params;
+  try {
+      const mentee = await Mentee.findById(menteeId).populate({
+          path: 'wishlist',
+          select: 'name surname jobTitle image'
+      });
+      
+      if (!mentee) {
+          return next(
+              new ApiError(
+                  "Mentee not found",
+                  httpStatus.NOT_FOUND,
+              )
+          );
+      }
+
+      ApiDataSuccess.send("Mentee's wish list loaded", httpStatus.OK, res, mentee.wishlist);
+  } catch (error) {
+      return next(
+          new ApiError(
+              "Something went wrong :(",
+              httpStatus.INTERNAL_SERVER_ERROR,
+          )
+      );
+  }
+};
+
 
 // Get applications
 // const getAppliedMentors = async (req, res, next) => {
