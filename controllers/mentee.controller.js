@@ -438,7 +438,6 @@ const addReview = async (req, res, next) => {
           );
       }
 
-      // Mentee'nin onaylı mentorlar listesinde olup olmadığını kontrol et
       if (!mentee.approvedMentors.includes(mentorId)) {
           return next(
               new ApiError(
@@ -462,7 +461,6 @@ const addReview = async (req, res, next) => {
       mentor.reviews.push(newReview._id);
       console.log("REVIEWS ARRAY:", mentor.reviews);
 
-      // Mentor'un ratingini güncelleme mantığı düzeltilmeli
       if (mentor.reviews.length > 1) {
           mentor.rating = (mentor.rating * (mentor.reviews.length - 1) + rating) / mentor.reviews.length;
       } else {
