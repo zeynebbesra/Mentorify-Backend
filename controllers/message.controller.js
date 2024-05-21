@@ -65,7 +65,7 @@ const sendMessage = async (req, res) => {
 			senderId,
 			receiverId,
 			message,
-			isDelivered: false,
+			isSeen: false,
 		});
 
 		if (newMessage) {
@@ -85,6 +85,7 @@ const sendMessage = async (req, res) => {
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
+
 
 
 const getMessages = async (req, res) => {
@@ -119,7 +120,7 @@ const getUsersForSidebar = async (req, res) => {
 	}
 };
 
-const markMessageAsDelivered = async (req, res) => {
+const markMessageAsSeen = async (req, res) => {
 	try {
 		const { messageId } = req.params;
 		
@@ -129,12 +130,12 @@ const markMessageAsDelivered = async (req, res) => {
 			return res.status(404).json({ error: "Message not found" });
 		}
 
-		message.isDelivered = true;
+		message.isSeen = true;
 		await message.save();
 
-		res.status(200).json({ message: "Message marked as delivered" });
+		res.status(200).json({ message: "Message marked as seen" });
 	} catch (error) {
-		console.log("Error in markMessageAsDelivered controller: ", error.message);
+		console.log("Error in markMessageAsSeen controller: ", error.message);
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
@@ -145,5 +146,5 @@ module.exports = {
     getMessages,
 	sendMessage,
 	getUsersForSidebar,
-	markMessageAsDelivered
+	markMessageAsSeen
 }
