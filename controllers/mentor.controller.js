@@ -33,11 +33,46 @@ const getMentors = async (req, res, next) => {
 
 //Get Mentor
 
+// const getMentor = async (req, res, next) => {
+//   const { id } = req.params;
+
+//   try {
+//     const mentor = await Mentor.findById(id);
+//     if (!mentor) {
+//       return next(
+//         new ApiError(
+//           `There is no mentor with this id: ${id}`,
+//           httpStatus.BAD_REQUEST
+//         )
+//       );
+//     }
+//     const { password, updatedAt, createdAt, ...other } = mentor._doc;
+
+//     ApiDataSuccess.send(
+//       "Mentor with given id found",
+//       httpStatus.OK,
+//       res,
+//       other
+//     );
+//   } catch (error) {
+//     return next(new ApiError(error.message, httpStatus.NOT_FOUND));
+//   }
+// };
+
 const getMentor = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const mentor = await Mentor.findById(id);
+    const mentor = await Mentor.findById(id)
+      .populate({
+        path: 'reviews',
+        populate: {
+          path: 'mentee',
+          select: 'name surname image'
+        }
+      })
+      .lean();
+
     if (!mentor) {
       return next(
         new ApiError(
@@ -46,7 +81,14 @@ const getMentor = async (req, res, next) => {
         )
       );
     }
-    const { password, updatedAt, createdAt, ...other } = mentor._doc;
+
+    // reviews içinde mentor id'sini çıkartma
+    mentor.reviews = mentor.reviews.map(review => {
+      const { mentor, ...reviewWithoutMentorId } = review;
+      return reviewWithoutMentorId;
+    });
+
+    const { password, updatedAt, createdAt, ...other } = mentor;
 
     ApiDataSuccess.send(
       "Mentor with given id found",
