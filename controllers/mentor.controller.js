@@ -245,13 +245,13 @@ const approveMentee = async (req, res, next) => {
           return next(new ApiError("Mentee not found in applicants list", httpStatus.NOT_FOUND));
       }
 
-      await Mentor.findByIdAndUpdate(req.user._id, {
+      await Mentor.findByIdAndUpdate(req.params.id, {
           $pull: { applicants: menteeId },
           $push: { approvedMentees: menteeId }
       });
 
       await Mentee.findByIdAndUpdate(menteeId, {
-          $push: { approvedMentors: req.user._id }
+          $push: { approvedMentors: req.params.mentorId }
       });
 
       NewApiDataSuccess.send("Mentee approved successfully", httpStatus.OK, res, { menteeId });

@@ -75,7 +75,7 @@ router
 router.delete('/applications/:mentorId/remove-mentor/:mentorId',menteeController.removeMentorFromList);
 
 router
-  .route('/:mentorId/reviews/:menteeId')
+  .route('/:menteeId/reviews/:mentorId')
   .post(menteeController.addReview)
 
 

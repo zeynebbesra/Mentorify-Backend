@@ -523,6 +523,81 @@ const addReview = async (req, res, next) => {
   }
 };
 
+// const addReview = async (req, res, next) => {
+//   try {
+//     const {rating, comment} = req.body;
+//     const {menteeId, mentorId} = req.params
+
+//     console.log("BODY",req.body)
+
+//     // Mentor'u bul ve populate ile reviews'ları getir
+//     const mentor = await Mentor.findById(mentorId).populate('reviews');
+//     if (!mentor) {
+//       return next(new ApiError('Mentor bulunamadı', httpStatus.NOT_FOUND));
+//     }
+
+//     // Mentee'yi bul
+//     const mentee = await Mentee.findById(menteeId);
+//     if (!mentee) {
+//       return next(new ApiError('Mentee bulunamadı', httpStatus.NOT_FOUND));
+//     }
+
+//     console.log("MENTOR:",mentor)
+//     console.log("MENTEE:",mentee)
+
+//     // console.log("approved",mentor.approvedMentees)
+
+//     // Mentee'nin bu mentor için onaylanmış olup olmadığını kontrol et
+//     if (!mentor.approvedMentees.includes(menteeId)) {
+//       return next(new ApiError('Bu mentee bu mentor için onaylanmamış', httpStatus.FORBIDDEN));
+//     }
+
+//     console.log("approved",mentor.approvedMentees)
+
+//     console.log("mentor:", mentor)
+
+//     // Yeni bir yorum oluştur
+//     const newReview = new Review({
+//       mentee: menteeId,
+//       mentor: mentorId,
+//       rating,
+//       comment,
+//     });
+
+//     console.log("NEW REVIEW:",newReview)
+
+//     // Yorumu kaydet
+//     const savedReview = await newReview.save();
+
+//     // Yorumu mentor'un review listesine ekle
+//     mentor.reviews.push(savedReview._id);
+
+//     console.log("SAVED REVIEW:",savedReview)
+
+//     // Tüm review'ları yeniden değerlendirerek yeni rating'i hesapla
+//     const totalRatings = await Review.find({ mentor: mentorId }).then(reviews => {
+//       return reviews.reduce((acc, review) => acc + review.rating, rating);
+//     });
+//     const totalReviews = mentor.reviews.length;
+
+//     mentor.rating = totalRatings / totalReviews;
+
+//     console.log("mentor:",mentor)
+
+//     console.log("RATING:",mentor.rating)
+
+//     await mentor.save();
+
+//     NewApiDataSuccess.send(
+//       'Review başarıyla eklendi!',
+//       httpStatus.CREATED,
+//       res,
+//       savedReview
+//     );
+//   } catch (error) {
+//     return next(new ApiError('Bir şeyler yanlış gitti :(', httpStatus.INTERNAL_SERVER_ERROR, error.message));
+//   }
+// };
 
 module.exports = {
     register,
