@@ -1,6 +1,7 @@
 const express = require("express");
 const PORT = process.env.PORT ?? 8800;
 const cors = require("cors");
+const path = require('path');
 const passport = require("passport");
 const cookieSession = require("cookie-session");
 const connection = require("./utils/db-connection");
@@ -39,6 +40,9 @@ app.use(
 
 // Middleware
 app.use(express.json()); // POST isteklerini parse etmek için
+// Static dosyaları sunma
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(helmet());
 app.use(morgan("common"));
 app.use("/public/uploads", express.static(__dirname + "/public/uploads"));

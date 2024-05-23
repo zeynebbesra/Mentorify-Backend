@@ -6,11 +6,12 @@ const Mentee = require("../models/mentee.model");
 const Mentor = require("../models/mentor.model");
 const Review = require("../models/review.model")
 const { createLoginToken } = require("../helpers/jwt.helper");
+const { generateResetToken } = require("../helpers/passwordResetToken.helper")
 const passwordHelper = require("../helpers/password.helper");
 const validatePassword = require("../helpers/passwordValidator.helper");
 const NewApiDataSuccess = require("../responses/success/api-success2");
 const { uploadImage } = require('../helpers/uploadImage.helper');
-
+const nodemailer = require('nodemailer');
 
 
 //Get Mentees
@@ -129,6 +130,7 @@ const login = async (req, res, next) => {
 };
 
 
+
 //Google ile giriş
 const googleLogin = (req, res, next) => {
   // Kullanıcı bilgilerini işleme
@@ -138,10 +140,6 @@ const googleLogin = (req, res, next) => {
     );
   }
 
-  // Kullanıcı bilgilerini kullanarak bir token oluştur
-  // const token = createLoginToken(req.user, res);
-
-  // Kullanıcıya başarılı giriş yanıtı gönder
   ApiDataSuccess.send(
     "Login with Google successful!",
     httpStatus.OK,
@@ -265,34 +263,6 @@ const getWishlist = async (req, res, next) => {
 };
 
 
-// const getAppliedMentors = async (req, res, next) => {
-//   const menteeId = req.params.menteeId;
-
-//   try {
-//     const mentee = await Mentee.findById(menteeId)
-//       .populate({
-//         path: 'applications',
-//         select: 'name surname jobTitle image' 
-//       });
-
-//     if (!mentee) {
-//       console.error('Mentee not found');
-//       return next(new ApiError('Mentee not found', httpStatus.NOT_FOUND));
-//     }
-
-//     if (mentee.applications.length === 0) {
-//       return NewApiDataSuccess.send('No mentors applied yet', httpStatus.OK, res, []);
-//     }
-
-//     NewApiDataSuccess.send('Applied mentors fetched successfully', httpStatus.OK, res, mentee.applications);
-  
-//   } catch (error) {
-//     console.error('Error fetching applied mentors:', error);
-//     return next(new ApiError('Internal Server Error', httpStatus.INTERNAL_SERVER_ERROR));
-//   }
-// };
-
-
 const getAppliedMentors = async (req, res, next) => {
   const menteeId = req.params.menteeId;
 
@@ -403,57 +373,6 @@ const removeMentorFromList = async (req, res, next) => {
 };
 
 //Add review to mentor
-// const addReview = async (req,res,next) => {
-//   const {mentorId, menteeId} = req.params
-//   const {rating, comment} = req.body
-//   console.log("BODY:",req.body)
-//   try {
-//     const mentor = await Mentor.findById(mentorId)
-//     const mentee = await Mentee.findById(menteeId)
-//     console.log("MENTEE:",mentee)
-//     console.log("MENTOR:",mentor)
-//     if (!mentor || !mentee) {
-//       return next(
-//           new ApiError(
-//               "Mentor or Mentee not found",
-//               httpStatus.NOT_FOUND,
-//           )
-//       );
-//     }
-//     if (!mentee.approvedMentors.includes(mentorId)) {
-//       return next(
-//           new ApiError(
-//               "Mentee is not approved by this mentor",
-//               httpStatus.FORBIDDEN,
-//           )
-//       );
-//     }
-//     const newReview = new Review({
-//       mentee: menteeId,
-//       mentor: mentorId,
-//       rating,
-//       comment
-//     })
-
-//     await newReview.save()
-
-//     mentor.reviews.push(newReview._id);
-//     mentor.rating = (mentor.rating * mentor.reviews.length + rating) / (mentor.reviews.length + 1);
-//     await mentor.save();
-
-//     ApiDataSuccess.send("Review added successfully", httpStatus.CREATED, res, newReview);
-
-    
-//   } catch (error) {
-//     return next(
-//       new ApiError(
-//         console.log("ERROR:",error.message),
-//           "Something went wrong :(",
-//           httpStatus.INTERNAL_SERVER_ERROR,
-//       )
-//     );
-//   }
-// }
 
 const addReview = async (req, res, next) => {
   const { mentorId, menteeId } = req.params;
@@ -523,82 +442,6 @@ const addReview = async (req, res, next) => {
   }
 };
 
-// const addReview = async (req, res, next) => {
-//   try {
-//     const {rating, comment} = req.body;
-//     const {menteeId, mentorId} = req.params
-
-//     console.log("BODY",req.body)
-
-//     // Mentor'u bul ve populate ile reviews'ları getir
-//     const mentor = await Mentor.findById(mentorId).populate('reviews');
-//     if (!mentor) {
-//       return next(new ApiError('Mentor bulunamadı', httpStatus.NOT_FOUND));
-//     }
-
-//     // Mentee'yi bul
-//     const mentee = await Mentee.findById(menteeId);
-//     if (!mentee) {
-//       return next(new ApiError('Mentee bulunamadı', httpStatus.NOT_FOUND));
-//     }
-
-//     console.log("MENTOR:",mentor)
-//     console.log("MENTEE:",mentee)
-
-//     // console.log("approved",mentor.approvedMentees)
-
-//     // Mentee'nin bu mentor için onaylanmış olup olmadığını kontrol et
-//     if (!mentor.approvedMentees.includes(menteeId)) {
-//       return next(new ApiError('Bu mentee bu mentor için onaylanmamış', httpStatus.FORBIDDEN));
-//     }
-
-//     console.log("approved",mentor.approvedMentees)
-
-//     console.log("mentor:", mentor)
-
-//     // Yeni bir yorum oluştur
-//     const newReview = new Review({
-//       mentee: menteeId,
-//       mentor: mentorId,
-//       rating,
-//       comment,
-//     });
-
-//     console.log("NEW REVIEW:",newReview)
-
-//     // Yorumu kaydet
-//     const savedReview = await newReview.save();
-
-//     // Yorumu mentor'un review listesine ekle
-//     mentor.reviews.push(savedReview._id);
-
-//     console.log("SAVED REVIEW:",savedReview)
-
-//     // Tüm review'ları yeniden değerlendirerek yeni rating'i hesapla
-//     const totalRatings = await Review.find({ mentor: mentorId }).then(reviews => {
-//       return reviews.reduce((acc, review) => acc + review.rating, rating);
-//     });
-//     const totalReviews = mentor.reviews.length;
-
-//     mentor.rating = totalRatings / totalReviews;
-
-//     console.log("mentor:",mentor)
-
-//     console.log("RATING:",mentor.rating)
-
-//     await mentor.save();
-
-//     NewApiDataSuccess.send(
-//       'Review başarıyla eklendi!',
-//       httpStatus.CREATED,
-//       res,
-//       savedReview
-//     );
-//   } catch (error) {
-//     return next(new ApiError('Bir şeyler yanlış gitti :(', httpStatus.INTERNAL_SERVER_ERROR, error.message));
-//   }
-// };
-
 module.exports = {
     register,
     login,
@@ -613,5 +456,6 @@ module.exports = {
     applyToMentor,
     removeMentorFromList,
     processPayment,
-    addReview
+    addReview,
+    // forgotPassword
 }

@@ -174,11 +174,13 @@ const login = async (req, res, next) => {
     const tokenExpiry = req.body.rememberMe ? '30d' : '24h'; // "Beni Hatırla" işaretliyse 30 gün, değilse 24 saat
     const accessToken = createLoginToken(user, tokenExpiry);
 
+    res.header('token', accessToken); // Token'ı header'a ekliyoruz
     NewApiDataSuccess.send("Login successful!", httpStatus.OK, res, accessToken, user._id, user.__t);
   } catch (error) {
     return next(new ApiError("Something went wrong :(", httpStatus.INTERNAL_SERVER_ERROR, error.message));
   }
 };
+
 
 
 //Forgot Password
@@ -195,8 +197,12 @@ const forgotPasswordMentor = async (req, res, next) => {
     user.resetPasswordExpires = resetTokenExpires;
     await user.save();
 
-    const resetUrl = `http://yourdomain.com/reset-password/${resetToken}`;
-    const message = `You requested a password reset. Please make a PUT request to: \n\n ${resetUrl}`;
+    const resetUrl = `http://localhost:8800/reset-password.html?token=${resetToken}`; //frontend url'i gelmeli
+    const message = `
+      <p>You requested a password reset.</p>
+      <p>Please click the link below to reset your password:</p>
+      <a href="${resetUrl}">Reset Password</a>
+    `;
 
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
@@ -210,7 +216,7 @@ const forgotPasswordMentor = async (req, res, next) => {
       to: user.email,
       from: process.env.EMAIL_USER,
       subject: 'Password Reset',
-      text: message
+      html: message
     });
 
     res.status(200).json({ message: 'Email sent' });
@@ -218,6 +224,7 @@ const forgotPasswordMentor = async (req, res, next) => {
     return next(new ApiError("Something went wrong", httpStatus.INTERNAL_SERVER_ERROR, error.message));
   }
 };
+
 
 //Reset Password
 const resetPasswordMentor = async (req, res, next) => {
@@ -230,7 +237,15 @@ const resetPasswordMentor = async (req, res, next) => {
       return next(new ApiError("Password reset token is invalid or has expired.", httpStatus.BAD_REQUEST));
     }
 
-    user.password = await bcrypt.hash(req.body.password, 10);
+    try {
+      validatePassword(req.body.password);
+    } catch (validationError) {
+      return next(new ApiError(validationError.message, httpStatus.BAD_REQUEST));
+    }
+
+    const hashedPassword = await passwordToHash(req.body.password);
+
+    user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();

@@ -18,21 +18,18 @@
 // module.exports = {createLoginToken}
 
 const jwt = require('jsonwebtoken');
-require('dotenv').config(); // Eğer ana dosyanızda yoksa burada da ekleyebilirsiniz
 
-const createLoginToken = (user, res) => {
+const createLoginToken = (user, expiresIn = '24h') => {
     const token = jwt.sign(
         {
             id: user.id,
             email: user.email
         },
-        process.env.SECRET || "fallbackSecret", // Eğer env değişkeni yüklenemezse, varsayılan bir secret kullan
+        process.env.SECRET,
         {
-            expiresIn: '24h',
+            expiresIn: expiresIn,
         }
     );
-
-    res.header('Authorization', 'Bearer ' + token); // Daha standart bir kullanım
     return token;
 };
 

@@ -17,9 +17,13 @@ router
     .route('/login')
     .post(mentorController.login)
 
-// router
-//     .route('/update/:id')
-//     .patch(mentorController.updateMentor)
+router
+    .route('/forgot-password')
+    .post(mentorController.forgotPasswordMentor)
+
+router
+    .route('/reset-password/:token')
+    .put(mentorController.resetPasswordMentor)
 
 router
     .route('/delete/:id')
