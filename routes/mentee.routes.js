@@ -9,6 +9,14 @@ router.route("/register").post(menteeController.register);
 
 router.route("/login").post(menteeController.login);
 
+router
+    .route('/forgot-password')
+    .post(menteeController.forgotPasswordMentee)
+
+router
+    .route('/reset-password/:token')
+    .put(menteeController.resetPasswordMentee)
+
 
 // Google ile giriş yapma yolu
 router.get(
@@ -40,6 +48,16 @@ router
 //   .patch(menteeController.updateMentee)
 
 router.patch('/:id', uploadOptions.single('image'), menteeController.updateMentee);
+
+// Şifre güncelleme talebi route'u
+router
+  .route('/:id/request-password-update')
+  .patch(menteeController.requestPasswordUpdateMentee)
+
+// Şifre güncelleme doğrulama route'u
+router
+  .route('/:id/verify-password-update')
+  .patch(menteeController.verifyPasswordUpdateMentee)
 
 router
   .route('/add-to-wishlist/:menteeId/:mentorId')

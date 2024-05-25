@@ -6,12 +6,18 @@ const Mentor = require("../models/mentor.model");
 const Mentee = require('../models/mentee.model');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createLoginToken } = require("../helpers/jwt.helper");
-const { generateResetToken } = require("../helpers/passwordResetToken.helper")
 const passwordHelper = require("../helpers/password.helper");
 const validatePassword = require("../helpers/passwordValidator.helper");
 const NewApiDataSuccess = require("../responses/success/api-success2");
 const { uploadImage } = require('../helpers/uploadImage.helper');
-const nodemailer = require('nodemailer');
+const { forgotPassword, resetPassword, requestPasswordUpdate, verifyPasswordUpdate } = require("./password.controller")
+
+
+const forgotPasswordMentor = (req, res, next) => forgotPassword(req, res, next, Mentor);
+const resetPasswordMentor = (req, res, next) => resetPassword(req, res, next, Mentor);
+
+const requestPasswordUpdateMentor = (req, res, next) => requestPasswordUpdate(req, res, next, Mentor);
+const verifyPasswordUpdateMentor = (req, res, next) => verifyPasswordUpdate(req, res, next, Mentor);
 
 //Get Mentors
 const getMentors = async (req, res, next) => {
@@ -171,7 +177,7 @@ const login = async (req, res, next) => {
       return next(new ApiError("Password is incorrect!", httpStatus.BAD_REQUEST));
     }
 
-    const tokenExpiry = req.body.rememberMe ? '30d' : '24h'; // "Beni Hatırla" işaretliyse 30 gün, değilse 24 saat
+    const tokenExpiry = req.body.rememberMe ? '30d' : '4h'; // "Beni Hatırla" işaretliyse 30 gün, değilse 24 saat
     const accessToken = createLoginToken(user, tokenExpiry);
 
     res.header('token', accessToken); // Token'ı header'a ekliyoruz
@@ -184,120 +190,150 @@ const login = async (req, res, next) => {
 
 
 //Forgot Password
-const forgotPasswordMentor = async (req, res, next) => {
-  try {
-    const user = await Mentor.findOne({ email: req.body.email });
-    if (!user) {
-      return next(new ApiError("No account with that email found.", httpStatus.BAD_REQUEST));
-    }
+// const forgotPasswordMentor = async (req, res, next) => {
+//   try {
+//     const user = await Mentor.findOne({ email: req.body.email });
+//     if (!user) {
+//       return next(new ApiError("No account with that email found.", httpStatus.BAD_REQUEST));
+//     }
 
-    const { resetToken, resetTokenExpires } = generateResetToken();
+//     const { resetToken, resetTokenExpires } = generateResetToken();
 
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = resetTokenExpires;
-    await user.save();
+//     user.resetPasswordToken = resetToken;
+//     user.resetPasswordExpires = resetTokenExpires;
+//     await user.save();
 
-    const resetUrl = `http://localhost:8800/reset-password.html?token=${resetToken}`; //frontend url'i gelmeli
-    const message = `
-      <p>You requested a password reset.</p>
-      <p>Please click the link below to reset your password:</p>
-      <a href="${resetUrl}">Reset Password</a>
-    `;
+//     const resetUrl = `http://localhost:8800/reset-password.html?token=${resetToken}`; //frontend url'i gelmeli
+//     const message = `
+//       <p>You requested a password reset.</p>
+//       <p>Please click the link below to reset your password:</p>
+//       <a href="${resetUrl}">Reset Password</a>
+//     `;
 
-    const transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    });
+//     const transporter = nodemailer.createTransport({
+//       service: 'Gmail',
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS
+//       }
+//     });
 
-    await transporter.sendMail({
-      to: user.email,
-      from: process.env.EMAIL_USER,
-      subject: 'Password Reset',
-      html: message
-    });
+//     await transporter.sendMail({
+//       to: user.email,
+//       from: process.env.EMAIL_USER,
+//       subject: 'Password Reset',
+//       html: message
+//     });
 
-    res.status(200).json({ message: 'Email sent' });
-  } catch (error) {
-    return next(new ApiError("Something went wrong", httpStatus.INTERNAL_SERVER_ERROR, error.message));
-  }
-};
+//     res.status(200).json({ message: 'Email sent' });
+//   } catch (error) {
+//     return next(new ApiError("Something went wrong", httpStatus.INTERNAL_SERVER_ERROR, error.message));
+//   }
+// };
 
 
 //Reset Password
-const resetPasswordMentor = async (req, res, next) => {
-  try {
-    const user = await Mentor.findOne({
-      resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() }
-    });
-    if (!user) {
-      return next(new ApiError("Password reset token is invalid or has expired.", httpStatus.BAD_REQUEST));
-    }
+// const resetPasswordMentor = async (req, res, next) => {
+//   try {
+//     const user = await Mentor.findOne({
+//       resetPasswordToken: req.params.token,
+//       resetPasswordExpires: { $gt: Date.now() }
+//     });
+//     if (!user) {
+//       return next(new ApiError("Password reset token is invalid or has expired.", httpStatus.BAD_REQUEST));
+//     }
 
-    try {
-      validatePassword(req.body.password);
-    } catch (validationError) {
-      return next(new ApiError(validationError.message, httpStatus.BAD_REQUEST));
-    }
+//     try {
+//       validatePassword(req.body.password);
+//     } catch (validationError) {
+//       return next(new ApiError(validationError.message, httpStatus.BAD_REQUEST));
+//     }
 
-    const hashedPassword = await passwordToHash(req.body.password);
+//     const hashedPassword = await passwordToHash(req.body.password);
 
-    user.password = hashedPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
-    await user.save();
+//     user.password = hashedPassword;
+//     user.resetPasswordToken = undefined;
+//     user.resetPasswordExpires = undefined;
+//     await user.save();
 
-    res.status(200).json({ message: 'Password has been reset.' });
-  } catch (error) {
-    return next(new ApiError("Something went wrong", httpStatus.INTERNAL_SERVER_ERROR, error.message));
-  }
-};
+//     res.status(200).json({ message: 'Password has been reset.' });
+//   } catch (error) {
+//     return next(new ApiError("Something went wrong", httpStatus.INTERNAL_SERVER_ERROR, error.message));
+//   }
+// };
 
 
 //Update Mentor
-const updateMentor = async (req, res, next) => {
+// const updateMentor = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const updatedData = req.body;
+
+//     if (updatedData.password) {
+//       updatedData.password = await passwordHelper.passwordToHash(updatedData.password);
+//     }
+
+//     const imagePath = uploadImage(req);
+//     if (imagePath) {
+//       updatedData.image = imagePath;
+//     }
+
+//     const updatedMentor = await Mentor.findByIdAndUpdate(
+//       id,
+//       updatedData,
+//       { new: true }
+//     );
+
+//     if (!updatedMentor) {
+//       return next(new ApiError("Mentor not found.", httpStatus.NOT_FOUND));
+//     }
+
+//     return ApiDataSuccess.send(
+//       updatedData.password ? "Password changed successfully!" : "Profile updated successfully!",
+//       httpStatus.OK, 
+//       res,
+//       updatedMentor
+//     );
+//   } catch (error) {
+//     return next(new ApiError(
+//       error.message,
+//       console.log("error", error.message),
+//       "Something went wrong :(",
+//       httpStatus.INTERNAL_SERVER_ERROR
+//     ));
+//   }
+// };
+
+const updateMentor = async (req, res, next, Model) => {
   try {
     const { id } = req.params;
     const updatedData = req.body;
-
-    if (updatedData.password) {
-      updatedData.password = await passwordHelper.passwordToHash(updatedData.password);
-    }
 
     const imagePath = uploadImage(req);
     if (imagePath) {
       updatedData.image = imagePath;
     }
 
-    const updatedMentor = await Mentor.findByIdAndUpdate(
+    const updatedUser = await Mentee.findByIdAndUpdate(
       id,
       updatedData,
       { new: true }
     );
 
-    if (!updatedMentor) {
-      return next(new ApiError("Mentor not found.", httpStatus.NOT_FOUND));
+    if (!updatedUser) {
+      return next(new ApiError("User not found.", httpStatus.NOT_FOUND));
     }
 
     return ApiDataSuccess.send(
-      updatedData.password ? "Password changed successfully!" : "Profile updated successfully!",
-      httpStatus.OK, 
+      "Profile updated successfully!",
+      httpStatus.OK,
       res,
-      updatedMentor
+      updatedUser
     );
   } catch (error) {
-    return next(new ApiError(
-      error.message,
-      console.log("error", error.message),
-      "Something went wrong :(",
-      httpStatus.INTERNAL_SERVER_ERROR
-    ));
+    return next(new ApiError("Something went wrong :(", httpStatus.INTERNAL_SERVER_ERROR, error.message));
   }
 };
-
 
 const deleteMentor = async (req, res, next) => {
   try {
@@ -406,5 +442,7 @@ module.exports = {
   approveMentee,
   rejectMentee,
   forgotPasswordMentor,
-  resetPasswordMentor
+  resetPasswordMentor,
+  requestPasswordUpdateMentor,
+  verifyPasswordUpdateMentor,
 };

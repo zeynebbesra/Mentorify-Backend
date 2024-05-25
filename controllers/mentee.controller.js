@@ -6,13 +6,19 @@ const Mentee = require("../models/mentee.model");
 const Mentor = require("../models/mentor.model");
 const Review = require("../models/review.model")
 const { createLoginToken } = require("../helpers/jwt.helper");
-const { generateResetToken } = require("../helpers/passwordResetToken.helper")
 const passwordHelper = require("../helpers/password.helper");
 const validatePassword = require("../helpers/passwordValidator.helper");
 const NewApiDataSuccess = require("../responses/success/api-success2");
 const { uploadImage } = require('../helpers/uploadImage.helper');
-const nodemailer = require('nodemailer');
+const { forgotPassword, resetPassword, requestPasswordUpdate, verifyPasswordUpdate } = require("./password.controller")
 
+
+const forgotPasswordMentee = (req, res, next) => forgotPassword(req, res, next, Mentee);
+const resetPasswordMentee = (req, res, next) => resetPassword(req, res, next, Mentee);
+
+
+const requestPasswordUpdateMentee = (req, res, next) => requestPasswordUpdate(req, res, next, Mentee);
+const verifyPasswordUpdateMentee = (req, res, next) => verifyPasswordUpdate(req, res, next, Mentee);
 
 //Get Mentees
 const getMentees = async (req, res, next) => {
@@ -90,46 +96,66 @@ const register = async (req, res, next) => {
 };
 
 
+// const login = async (req, res, next) => {
+//   try {
+//     const user = await Mentee.findOne({ email: req.body.email });
+//     if (!user) {
+//       return next(
+//         new ApiError("Email or password is incorrect!", httpStatus.BAD_REQUEST)
+//       );
+
+//     }
+//     const validPassword = await bcrypt.compare(
+//       req.body.password,
+//       user.password
+//     );
+//     if (!validPassword) {
+//       return next(
+//         new ApiError("Password is incorrect!", httpStatus.BAD_REQUEST)
+//       );
+//     }
+//     const accessToken = createLoginToken(user, res);
+//     NewApiDataSuccess.send(
+//       "Login successfull!",
+//       httpStatus.OK,
+//       res,
+//       accessToken,
+//       user._id,
+//       user.__t
+//     );
+//   } catch (error) {
+//     return next(
+//       new ApiError(
+//         console.log(error),
+//         "Something went wrong :(",
+//         httpStatus.INTERNAL_SERVER_ERROR,
+//         error.message
+//       )
+//     );
+//   }
+// };
+
 const login = async (req, res, next) => {
   try {
     const user = await Mentee.findOne({ email: req.body.email });
     if (!user) {
-      return next(
-        new ApiError("Email or password is incorrect!", httpStatus.BAD_REQUEST)
-      );
+      return next(new ApiError("Email or password is incorrect!", httpStatus.BAD_REQUEST));
+    }
 
-    }
-    const validPassword = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
+    const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) {
-      return next(
-        new ApiError("Password is incorrect!", httpStatus.BAD_REQUEST)
-      );
+      return next(new ApiError("Password is incorrect!", httpStatus.BAD_REQUEST));
     }
-    const accessToken = createLoginToken(user, res);
-    NewApiDataSuccess.send(
-      "Login successfull!",
-      httpStatus.OK,
-      res,
-      accessToken,
-      user._id,
-      user.__t
-    );
+
+    const tokenExpiry = req.body.rememberMe ? '30d' : '4h'; // "Beni Hatırla" işaretliyse 30 gün, değilse 4 saat
+    const accessToken = createLoginToken(user, tokenExpiry);
+
+    res.header('token', accessToken); // Token'ı header'a ekliyoruz
+    NewApiDataSuccess.send("Login successful!", httpStatus.OK, res, accessToken, user._id, user.__t);
   } catch (error) {
-    return next(
-      new ApiError(
-        console.log(error),
-        "Something went wrong :(",
-        httpStatus.INTERNAL_SERVER_ERROR,
-        error.message
-      )
-    );
+    return next(new ApiError("Something went wrong :(", httpStatus.INTERNAL_SERVER_ERROR, error.message));
   }
 };
-
-
 
 //Google ile giriş
 const googleLogin = (req, res, next) => {
@@ -148,47 +174,79 @@ const googleLogin = (req, res, next) => {
   );
 };
 
+// //Update mentee
+// const updateMentee = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const updatedData = req.body;
+
+//     if (updatedData.password) {
+//       updatedData.password = await passwordHelper.passwordToHash(updatedData.password);
+//     }
+
+//     const imagePath = uploadImage(req);
+//     if (imagePath) {
+//       updatedData.image = imagePath;  
+//     }
+
+//     const updatedMentee = await Mentee.findByIdAndUpdate(
+//       id,
+//       updatedData,
+//       { new: true }
+//     );
+
+//     if (!updatedMentee) {
+//       return next(new ApiError("Mentee not found.", httpStatus.NOT_FOUND));
+//     }
+
+//     return ApiDataSuccess.send(
+//       updatedData.password ? "Password changed successfully!" : "Profile updated successfully!",
+//       httpStatus.OK, 
+//       res,
+//       updatedMentee
+//     );
+//   } catch (error) {
+//     return next(new ApiError(
+//       error.message,
+//       console.log("error",error.message),
+//       "Something went wrong :(",
+//       httpStatus.INTERNAL_SERVER_ERROR
+//     ));
+//   }
+// };
+
 //Update mentee
-const updateMentee = async (req, res, next) => {
+
+const updateMentee = async (req, res, next, Model) => {
   try {
     const { id } = req.params;
     const updatedData = req.body;
 
-    if (updatedData.password) {
-      updatedData.password = await passwordHelper.passwordToHash(updatedData.password);
-    }
-
     const imagePath = uploadImage(req);
     if (imagePath) {
-      updatedData.image = imagePath;  
+      updatedData.image = imagePath;
     }
 
-    const updatedMentee = await Mentee.findByIdAndUpdate(
+    const updatedUser = await Mentee.findByIdAndUpdate(
       id,
       updatedData,
       { new: true }
     );
 
-    if (!updatedMentee) {
-      return next(new ApiError("Mentee not found.", httpStatus.NOT_FOUND));
+    if (!updatedUser) {
+      return next(new ApiError("User not found.", httpStatus.NOT_FOUND));
     }
 
     return ApiDataSuccess.send(
-      updatedData.password ? "Password changed successfully!" : "Profile updated successfully!",
-      httpStatus.OK, 
+      "Profile updated successfully!",
+      httpStatus.OK,
       res,
-      updatedMentee
+      updatedUser
     );
   } catch (error) {
-    return next(new ApiError(
-      error.message,
-      console.log("error",error.message),
-      "Something went wrong :(",
-      httpStatus.INTERNAL_SERVER_ERROR
-    ));
+    return next(new ApiError("Something went wrong :(", httpStatus.INTERNAL_SERVER_ERROR, error.message));
   }
 };
-
 
 // Wishlist'e Mentor Ekleme
 const addToWishlist = async(req,res,next) => {
@@ -457,5 +515,8 @@ module.exports = {
     removeMentorFromList,
     processPayment,
     addReview,
-    // forgotPassword
+    forgotPasswordMentee,
+    resetPasswordMentee,
+    requestPasswordUpdateMentee,
+    verifyPasswordUpdateMentee,
 }

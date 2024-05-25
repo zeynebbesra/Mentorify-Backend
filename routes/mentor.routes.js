@@ -11,7 +11,16 @@ router
 router.post('/register', uploadOptions.single('image'), mentorController.register)
 
 router.patch('/:id', uploadOptions.single('image'), mentorController.updateMentor)
-    
+
+//Şifre güncelleme tlebi route'u
+router
+    .route('/:id/request-password-update')
+    .patch(mentorController.requestPasswordUpdateMentor)
+
+//Şifre günccelleme doğrulama route'u
+router
+    .route('/:id/verify-password-update')
+    .patch(mentorController.verifyPasswordUpdateMentor)
 
 router
     .route('/login')
@@ -24,6 +33,7 @@ router
 router
     .route('/reset-password/:token')
     .put(mentorController.resetPasswordMentor)
+
 
 router
     .route('/delete/:id')
