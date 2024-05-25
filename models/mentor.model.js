@@ -48,7 +48,13 @@ const mentorSchema = new mongoose.Schema(
         approvedMentees: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Mentee'
-        }]
+        }],
+        verificationCode:{
+            type: Number,
+        },
+        verificationCodeExpires:{
+            type: Date
+        }
     },
     { discriminatorKey: 'kind' }
 )

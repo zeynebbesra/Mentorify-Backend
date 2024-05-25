@@ -22,6 +22,12 @@ const menteeSchema = new mongoose.Schema(
         image: {
             type: String
         },
+        verificationCode:{
+            type: Number,
+        },
+        verificationCodeExpires:{
+            type: Date
+        }
     },
     { discriminatorKey: 'kind' }
 )
