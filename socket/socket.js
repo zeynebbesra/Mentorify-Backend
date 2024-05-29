@@ -7,10 +7,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
 	cors: {
-		origin: ["http://localhost:3000"],
-		methods: ["GET", "POST"],
+		origin: ["https://mentorify-frontend.vercel.app"],
+		methods: ["GET", "POST","PATCH","PUT","DELETE"],
+		credentials: true
 	},
 });
+
 
 const getReceiverSocketId = (receiverId) => {
 	return userSocketMap[receiverId];
