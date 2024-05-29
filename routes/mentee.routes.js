@@ -18,18 +18,21 @@ router
     .put(menteeController.resetPasswordMentee)
 
 
-// Google ile giriş yapma yolu
-router.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+// Google authentication route
+router
+    .route('/auth/google')
+    .get(passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// Google callback yolu
-router.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/api/v1/mentees/login" }),
-  menteeController.googleLogin
-);
+// Google authentication callback route
+router
+    .route('/auth/google/callback')
+    .get(
+        passport.authenticate('google', { failureRedirect: '/' }),
+        (req, res) => {
+            // Successful authentication, redirect home or to another route
+            res.redirect(`/api/v1/mentees/${req.user.id}`); // Başarılı oturum açma sonrası yönlendirme
+        }
+    );
 
 router.route("/").get(menteeController.getMentees);
 
