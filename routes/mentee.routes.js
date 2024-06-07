@@ -100,4 +100,8 @@ router
   .post(menteeController.addReview)
 
 
+router
+  .route('/get-recommendations')
+  .post(menteeController.getRecommendations);
+
 module.exports = router

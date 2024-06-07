@@ -11,7 +11,7 @@ const validatePassword = require("../helpers/passwordValidator.helper");
 const NewApiDataSuccess = require("../responses/success/api-success2");
 const { uploadImage } = require('../helpers/uploadImage.helper');
 const { forgotPassword, resetPassword, requestPasswordUpdate, verifyPasswordUpdate } = require("./password.controller")
-
+const axios = require('axios');
 
 const forgotPasswordMentee = (req, res, next) => forgotPassword(req, res, next, Mentee);
 const resetPasswordMentee = (req, res, next) => resetPassword(req, res, next, Mentee);
@@ -500,6 +500,41 @@ const addReview = async (req, res, next) => {
   }
 };
 
+
+const getRecommendations = async (req, res, next) => {
+  try {
+    // Mentee modelini kullanarak mentee verilerini alın
+    const mentee = await Mentee.findById(req.body.mentee_id).populate('interests');
+
+    if (!mentee) {
+      return next(new ApiError("Mentee not found", httpStatus.NOT_FOUND));
+    }
+
+    // mentee.interests array'ini string'e çeviriyoruz
+    const menteeInterests = mentee.interests.join(', ');
+
+    const menteeData = {
+      mentee_id: mentee._id,
+      mentee_interests: menteeInterests,
+      mentee_category: req.body.mentee_category // Bu bilgiyi request body'den alıyoruz
+    };
+  
+    const response = await axios.post('http://127.0.0.1:5000/recommend', menteeData);
+
+    ApiDataSuccess.send(
+      "Recommendations fetched successfully",
+      httpStatus.OK,
+      res,
+      response.data
+    );
+  } catch (error) {
+    console.error('Error fetching recommendations:', error);
+    return next(
+      new ApiError("Error fetching recommendations", httpStatus.INTERNAL_SERVER_ERROR)
+    );
+  }
+};
+
 module.exports = {
     register,
     login,
@@ -519,4 +554,5 @@ module.exports = {
     resetPasswordMentee,
     requestPasswordUpdateMentee,
     verifyPasswordUpdateMentee,
+    getRecommendations
 }
