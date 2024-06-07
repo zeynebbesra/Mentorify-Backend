@@ -503,7 +503,6 @@ const addReview = async (req, res, next) => {
 
 const getRecommendations = async (req, res, next) => {
   try {
-    // Mentee modelini kullanarak mentee verilerini alın
     const mentee = await Mentee.findById(req.body.mentee_id).populate('interests');
 
     if (!mentee) {
@@ -516,7 +515,7 @@ const getRecommendations = async (req, res, next) => {
     const menteeData = {
       mentee_id: mentee._id,
       mentee_interests: menteeInterests,
-      mentee_category: req.body.mentee_category // Bu bilgiyi request body'den alıyoruz
+      mentee_category: req.body.mentee_category 
     };
   
     const response = await axios.post('http://127.0.0.1:5000/recommend', menteeData);
