@@ -7,6 +7,10 @@ const menteeSchema = new mongoose.Schema(
             type: String,
             ref: 'Interest',
         }],
+        category:{
+            type: String,
+            ref: 'Category'
+        },
         wishlist: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Mentor',
