@@ -57,6 +57,7 @@ const menteeRouter = require("./routes/mentee.routes");
 const categoryRouter = require("./routes/category.routes");
 const messageRouter = require("./routes/message.routes");
 const paymentRouter = require("./routes/payment.routes.js");
+const interestRouter = require("./routes/interest.route.js")
 
 const api = process.env.API_URL;
 
@@ -65,6 +66,7 @@ app.use(`${api}/mentees`, menteeRouter);
 app.use(`${api}/categories`, categoryRouter);
 app.use(`${api}/messages`, messageRouter);
 app.use(`${api}/payments`, paymentRouter);
+app.use(`${api}/interests`, interestRouter)
 
 app.get('/test-auth', authenticateUser, (req, res) => {
   res.status(200).json({ user: req.user });
