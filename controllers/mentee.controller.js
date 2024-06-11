@@ -217,7 +217,7 @@ const googleLogin = (req, res, next) => {
 
 //Update mentee
 
-const updateMentee = async (req, res, next, Model) => {
+const updateMentee = async (req, res, next) => {
   try {
     const { id } = req.params;
     const updatedData = req.body;

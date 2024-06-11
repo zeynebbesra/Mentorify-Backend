@@ -50,7 +50,11 @@ router
 //   .route('/:id')
 //   .patch(menteeController.updateMentee)
 
-router.patch('/:id', uploadOptions.single('image'), menteeController.updateMentee);
+// router.patch('/:id', uploadOptions.single('image'), menteeController.updateMentee);
+
+router
+  .route('/:id')
+  .patch(uploadOptions.single('image'), menteeController.updateMentee)
 
 // Şifre güncelleme talebi route'u
 router

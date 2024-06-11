@@ -10,7 +10,9 @@ router
 
 router.post('/register', uploadOptions.single('image'), mentorController.register)
 
-router.patch('/:id', uploadOptions.single('image'), mentorController.updateMentor)
+router
+  .route('/:id')
+  .patch(uploadOptions.single('image'), mentorController.updateMentor)
 
 //Şifre güncelleme tlebi route'u
 router

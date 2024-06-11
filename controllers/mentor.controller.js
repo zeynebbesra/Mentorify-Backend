@@ -304,7 +304,7 @@ const login = async (req, res, next) => {
 //   }
 // };
 
-const updateMentor = async (req, res, next, Model) => {
+const updateMentor = async (req, res, next) => {
   try {
     const { id } = req.params;
     const updatedData = req.body;
@@ -314,7 +314,7 @@ const updateMentor = async (req, res, next, Model) => {
       updatedData.image = imagePath;
     }
 
-    const updatedUser = await Mentee.findByIdAndUpdate(
+    const updatedUser = await Mentor.findByIdAndUpdate(
       id,
       updatedData,
       { new: true }
