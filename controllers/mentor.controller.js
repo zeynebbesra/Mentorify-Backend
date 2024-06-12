@@ -11,7 +11,7 @@ const validatePassword = require("../helpers/passwordValidator.helper");
 const NewApiDataSuccess = require("../responses/success/api-success2");
 const { uploadImage } = require('../helpers/uploadImage.helper');
 const { forgotPassword, resetPassword, requestPasswordUpdate, verifyPasswordUpdate } = require("./password.controller")
-
+const createSubMerchant = require('../utils/iyzico')
 
 const forgotPasswordMentor = (req, res, next) => forgotPassword(req, res, next, Mentor);
 const resetPasswordMentor = (req, res, next) => resetPassword(req, res, next, Mentor);
@@ -111,9 +111,16 @@ const register = async (req, res, next) => {
       github: req.body.github,
       linkedin: req.body.linkedin,
       price: req.body.price,
+      iban: req.body.iban,
+      address: req.body.address, 
+      phone: req.body.phone, 
+      identityNumber: req.body.identityNumber
     });
 
     const mentor = await newMentor.save();
+
+    await createSubMerchant(mentor);
+
     ApiDataSuccess.send(
       "Register succesfull!",
       httpStatus.CREATED,
@@ -169,6 +176,8 @@ const updateMentor = async (req, res, next) => {
     if (!updatedUser) {
       return next(new ApiError("User not found.", httpStatus.NOT_FOUND));
     }
+
+    await createSubMerchant(updatedUser);
 
     return ApiDataSuccess.send(
       "Profile updated successfully!",

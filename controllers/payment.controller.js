@@ -26,9 +26,13 @@ const payment = async (req, res, next) => {
             return next(new ApiError("Mentee is not approved by this mentor", httpStatus.BAD_REQUEST));
         }
 
+        if (!mentor.iyzicoSubMerchantKey) {
+            return next(new ApiError("Mentor does not have a submerchant key", httpStatus.BAD_REQUEST));
+        }
+
         const request = {
             locale: Iyzipay.LOCALE.TR,
-            conversationId: '123456789',
+            conversationId: `${menteeId}-${mentorId}-${Date.now()}`,
             price: mentor.price.toString(),
             paidPrice: mentor.price.toString(),
             currency: Iyzipay.CURRENCY.TRY,
@@ -44,12 +48,14 @@ const payment = async (req, res, next) => {
                     name: mentor.jobTitle,
                     category1: mentor.category,
                     itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
-                    price: mentor.price.toString()
+                    price: mentor.price.toString(),
+                    subMerchantKey: mentor.iyzicoSubMerchantKey, // Mentor'a ödeme yönlendirilmesi
+                    subMerchantPrice: mentor.price.toString() // Mentor'a gidecek miktar
                 }
             ]
         };
 
-        iyzipay.payment.create(request, async (err, result) => {
+        iyzipay.payment.create(request, (err, result) => {
             if (err) {
                 return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(err);
             }

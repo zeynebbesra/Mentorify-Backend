@@ -54,6 +54,25 @@ const mentorSchema = new mongoose.Schema(
         },
         verificationCodeExpires:{
             type: Date
+        },
+        iban: {
+            type: String,
+            required: true
+        },
+        iyzicoSubMerchantKey: {
+            type: String
+        },
+        address: {
+            type: String,
+            required: true
+        },
+        phone: {
+            type: String,
+            required: true
+        },
+        identityNumber: {
+            type: String,
+            required: true
         }
     },
     { discriminatorKey: 'kind' }
