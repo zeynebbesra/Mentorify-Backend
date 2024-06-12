@@ -56,7 +56,7 @@ const mentorRouter = require("./routes/mentor.routes");
 const menteeRouter = require("./routes/mentee.routes");
 const categoryRouter = require("./routes/category.routes");
 const messageRouter = require("./routes/message.routes");
-const paymentRouter = require("./routes/payment.routes.js");
+const paymentRouter = require("./routes/payment.route.js")
 const interestRouter = require("./routes/interest.route.js")
 
 const api = process.env.API_URL;

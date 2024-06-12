@@ -48,6 +48,7 @@ const forgotPassword = async (req, res, next, Model) => {
 
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = resetTokenExpires;
+    console.log("reset token:",resetToken)
     await user.save();
 
     await sendResetEmail(user, resetToken);
