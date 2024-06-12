@@ -9,7 +9,7 @@ const path = require("path");
 const fs = require("fs");
 
 const sendResetEmail = async (user, resetToken) => {
-  const resetUrl = `http://localhost:8800/reset-password.html?token=${resetToken}`;
+  const resetUrl = "localhost:3000/reset-password";
   const message = `
         <p>You requested a password reset.</p>
         <p>Please click the link below to reset your password:</p>

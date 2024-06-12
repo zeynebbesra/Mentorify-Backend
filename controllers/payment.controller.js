@@ -54,6 +54,7 @@ const payment = async (req, res, next) => {
                 }
             ]
         };
+        console.log("req",request)
 
         iyzipay.payment.create(request, (err, result) => {
             if (err) {

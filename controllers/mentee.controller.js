@@ -96,44 +96,6 @@ const register = async (req, res, next) => {
 };
 
 
-// const login = async (req, res, next) => {
-//   try {
-//     const user = await Mentee.findOne({ email: req.body.email });
-//     if (!user) {
-//       return next(
-//         new ApiError("Email or password is incorrect!", httpStatus.BAD_REQUEST)
-//       );
-
-//     }
-//     const validPassword = await bcrypt.compare(
-//       req.body.password,
-//       user.password
-//     );
-//     if (!validPassword) {
-//       return next(
-//         new ApiError("Password is incorrect!", httpStatus.BAD_REQUEST)
-//       );
-//     }
-//     const accessToken = createLoginToken(user, res);
-//     NewApiDataSuccess.send(
-//       "Login successfull!",
-//       httpStatus.OK,
-//       res,
-//       accessToken,
-//       user._id,
-//       user.__t
-//     );
-//   } catch (error) {
-//     return next(
-//       new ApiError(
-//         console.log(error),
-//         "Something went wrong :(",
-//         httpStatus.INTERNAL_SERVER_ERROR,
-//         error.message
-//       )
-//     );
-//   }
-// };
 
 const login = async (req, res, next) => {
   try {
@@ -173,47 +135,6 @@ const googleLogin = (req, res, next) => {
     user
   );
 };
-
-// //Update mentee
-// const updateMentee = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const updatedData = req.body;
-
-//     if (updatedData.password) {
-//       updatedData.password = await passwordHelper.passwordToHash(updatedData.password);
-//     }
-
-//     const imagePath = uploadImage(req);
-//     if (imagePath) {
-//       updatedData.image = imagePath;  
-//     }
-
-//     const updatedMentee = await Mentee.findByIdAndUpdate(
-//       id,
-//       updatedData,
-//       { new: true }
-//     );
-
-//     if (!updatedMentee) {
-//       return next(new ApiError("Mentee not found.", httpStatus.NOT_FOUND));
-//     }
-
-//     return ApiDataSuccess.send(
-//       updatedData.password ? "Password changed successfully!" : "Profile updated successfully!",
-//       httpStatus.OK, 
-//       res,
-//       updatedMentee
-//     );
-//   } catch (error) {
-//     return next(new ApiError(
-//       error.message,
-//       console.log("error",error.message),
-//       "Something went wrong :(",
-//       httpStatus.INTERNAL_SERVER_ERROR
-//     ));
-//   }
-// };
 
 //Update mentee
 

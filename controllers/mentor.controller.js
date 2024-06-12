@@ -11,7 +11,7 @@ const validatePassword = require("../helpers/passwordValidator.helper");
 const NewApiDataSuccess = require("../responses/success/api-success2");
 const { uploadImage } = require('../helpers/uploadImage.helper');
 const { forgotPassword, resetPassword, requestPasswordUpdate, verifyPasswordUpdate } = require("./password.controller")
-const createSubMerchant = require('../utils/iyzico')
+const {createSubMerchant} = require('../utils/iyzico')
 
 const forgotPasswordMentor = (req, res, next) => forgotPassword(req, res, next, Mentor);
 const resetPasswordMentor = (req, res, next) => resetPassword(req, res, next, Mentor);
@@ -119,7 +119,7 @@ const register = async (req, res, next) => {
 
     const mentor = await newMentor.save();
 
-    await createSubMerchant(mentor);
+    // await createSubMerchant(mentor);
 
     ApiDataSuccess.send(
       "Register succesfull!",
@@ -177,7 +177,7 @@ const updateMentor = async (req, res, next) => {
       return next(new ApiError("User not found.", httpStatus.NOT_FOUND));
     }
 
-    await createSubMerchant(updatedUser);
+    // await createSubMerchant(updatedUser);
 
     return ApiDataSuccess.send(
       "Profile updated successfully!",
@@ -186,7 +186,7 @@ const updateMentor = async (req, res, next) => {
       updatedUser
     );
   } catch (error) {
-    return next(new ApiError("Something went wrong :(", httpStatus.INTERNAL_SERVER_ERROR, error.message));
+    return next(new ApiError(console.log("error",error.message),"Something went wrong :(", httpStatus.INTERNAL_SERVER_ERROR, error.message));
   }
 };
 

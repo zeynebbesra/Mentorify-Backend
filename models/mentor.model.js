@@ -57,22 +57,22 @@ const mentorSchema = new mongoose.Schema(
         },
         iban: {
             type: String,
-            required: true
+            // required: true
         },
         iyzicoSubMerchantKey: {
             type: String
         },
         address: {
             type: String,
-            required: true
+            // required: true
         },
         phone: {
             type: String,
-            required: true
+            // required: true
         },
         identityNumber: {
             type: String,
-            required: true
+            // required: true
         }
     },
     { discriminatorKey: 'kind' }
