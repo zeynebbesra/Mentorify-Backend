@@ -21,7 +21,16 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: true
+            validate: {
+                validator: function(value) {
+                    // Eğer googleId yoksa, password zorunlu olmalı
+                    if (!this.googleId && !value) {
+                        return false;
+                    }
+                    return true;
+                },
+                message: 'Password is required if not using Google login'
+            }
         },
         desc: {
             type: String,

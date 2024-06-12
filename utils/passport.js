@@ -15,6 +15,7 @@ passport.use(new GoogleStrategy({
     try {
       let user = await Mentee.findOne({ googleId: profile.id });
       console.log("profile",profile)
+      console.log("profile id:", profile.id)
       if (!user) {
         // Kullanıcı veritabanında değilse, yeni bir kullanıcı oluştur
         user = new Mentee({
@@ -27,7 +28,7 @@ passport.use(new GoogleStrategy({
         });
         await user.save();
       }
-      
+      console.log("USER:",user)
 
       return done(null, user);
     } catch (error) {
