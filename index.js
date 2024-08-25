@@ -3,7 +3,7 @@ const PORT = process.env.PORT ?? 8800;
 const cors = require("cors");
 const path = require('path');
 const passport = require("passport");
-const session = require('express-session');  // express-session kullanılıyor
+const session = require('express-session');  
 const connection = require("./utils/db-connection");
 const errorHandler = require("./middlewares/error-handler");
 const dotenv = require("dotenv");
@@ -56,7 +56,6 @@ const mentorRouter = require("./routes/mentor.routes");
 const menteeRouter = require("./routes/mentee.routes");
 const categoryRouter = require("./routes/category.routes");
 const messageRouter = require("./routes/message.routes");
-const paymentRouter = require("./routes/payment.route.js")
 const interestRouter = require("./routes/interest.route.js")
 const passwordRouter = require("./routes/password.route.js")
 
@@ -66,7 +65,6 @@ app.use(`${api}/mentors`, mentorRouter);
 app.use(`${api}/mentees`, menteeRouter);
 app.use(`${api}/categories`, categoryRouter);
 app.use(`${api}/messages`, messageRouter);
-app.use(`${api}/payments`, paymentRouter);
 app.use(`${api}/interests`, interestRouter)
 app.use(`${api}`, passwordRouter)
 
