@@ -146,7 +146,7 @@ const login = async (req, res, next) => {
       return next(new ApiError("Password is incorrect!", httpStatus.BAD_REQUEST));
     }
 
-    const tokenExpiry = req.body.rememberMe ? '30d' : '4h'; // "Beni Hatırla" işaretliyse 30 gün, değilse 24 saat
+    const tokenExpiry = req.body.rememberMe ? '30d' : '4h'; // "Beni Hatırla" işaretliyse 30 gün, değilse 4 saat
     const accessToken = createLoginToken(user, tokenExpiry);
 
     res.header('token', accessToken); // Token'ı header'a ekliyoruz

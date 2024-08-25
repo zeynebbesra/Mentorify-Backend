@@ -14,28 +14,28 @@ router
   .route('/:id')
   .patch(uploadOptions.single('image'), mentorController.updateMentor)
 
-//Şifre güncelleme talebi route'u
-router
-    .route('/:id/request-password-update')
-    .patch(mentorController.requestPasswordUpdateMentor)
+// //Şifre güncelleme talebi route'u
+// router
+//     .route('/:id/request-password-update')
+//     .patch(mentorController.requestPasswordUpdateMentor)
 
 //Şifre güncelleme doğrulama route'u
-router
-    .route('/:id/verify-password-update')
-    .patch(mentorController.verifyPasswordUpdateMentor)
+// router
+//     .route('/:id/verify-password-update')
+//     .patch(mentorController.verifyPasswordUpdateMentor)
 
 router
     .route('/login')
     .post(mentorController.login)
 
    
-router
-    .route('/forgot-password')
-    .post(mentorController.forgotPasswordMentor)
+// router
+//     .route('/forgot-password')
+//     .post(mentorController.forgotPasswordMentor)
 
-router
-    .route('/reset-password/:token')
-    .put(mentorController.resetPasswordMentor)
+// router
+//     .route('/reset-password/:token')
+//     .put(mentorController.resetPasswordMentor)
 
 router
     .route('/delete/:id')

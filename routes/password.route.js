@@ -1,23 +1,41 @@
-const express = require('express')
-const router = express.Router()
-const passwordController = require('../controllers/password.controller')
+// const express = require('express')
+// const router = express.Router()
+// const passwordController = require('../controllers/password.controller')
 
-//Şifre güncelleme talebi route'u
-router
-    .route('/:id/request-password-update')
-    .patch(passwordController.requestPasswordUpdate)
+// //Şifre güncelleme talebi route'u
+// router
+//     .route('/:id/request-password-update')
+//     .patch(passwordController.requestPasswordUpdate)
 
-//Şifre güncelleme doğrulama route'u
-router
-    .route('/:id/verify-password-update')
-    .patch(passwordController.verifyPasswordUpdate)
+// //Şifre güncelleme doğrulama route'u
+// router
+//     .route('/:id/verify-password-update')
+//     .patch(passwordController.verifyPasswordUpdate)
    
-router
-    .route('/forgot-password')
-    .post(passwordController.forgotPassword)
+// router
+//     .route('/forgot-password')
+//     .post(passwordController.forgotPassword)
 
-router
-    .route('/reset-password/:token')
-    .put(passwordController.resetPassword)
+// router
+//     .route('/reset-password/:token')
+//     .put(passwordController.resetPassword)
 
-module.exports = router
+// module.exports = router
+
+const express = require('express');
+const router = express.Router();
+const passwordController = require('../controllers/password.controller');
+
+// Şifre güncelleme talebi route'u
+router.route('/:id/request-password-update').patch(passwordController.requestPasswordUpdate);
+
+// Şifre güncelleme doğrulama route'u
+router.route('/:id/verify-password-update').patch(passwordController.verifyPasswordUpdate);
+
+// Şifre sıfırlama isteği route'u
+router.route('/forgot-password').post(passwordController.forgotPassword);
+
+// Şifre sıfırlama route'u
+router.route('/reset-password').post(passwordController.resetPassword);
+
+module.exports = router;

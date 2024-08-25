@@ -58,6 +58,7 @@ const categoryRouter = require("./routes/category.routes");
 const messageRouter = require("./routes/message.routes");
 const paymentRouter = require("./routes/payment.route.js")
 const interestRouter = require("./routes/interest.route.js")
+const passwordRouter = require("./routes/password.route.js")
 
 const api = process.env.API_URL;
 
@@ -67,6 +68,7 @@ app.use(`${api}/categories`, categoryRouter);
 app.use(`${api}/messages`, messageRouter);
 app.use(`${api}/payments`, paymentRouter);
 app.use(`${api}/interests`, interestRouter)
+app.use(`${api}`, passwordRouter)
 
 app.get('/test-auth', authenticateUser, (req, res) => {
   res.status(200).json({ user: req.user });
